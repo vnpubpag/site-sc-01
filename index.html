@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>ChiTiet Dot Wiki</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link rel="stylesheet" href="assets/css/theme.css">
+    </head>
+    <body>
+        <div class="top-bar text-bg-primary py-2">
+            <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-1">
+                <a class="navbar-brand text-white fw-semibold m-0" href="#home">ChiTiet Dot Wiki</a>
+                <div class="d-flex gap-3 small text-uppercase">
+                    <a class="link-light text-decoration-none" href="#about">About Us</a>
+                    <a class="link-light text-decoration-none" href="#contact">Contact</a>
+                    <a class="link-light text-decoration-none" href="#disclaimer">Disclaimer</a>
+                </div>
+            </div>
+        </div>
+        <header class="shadow-sm sticky-top bg-white">
+            <div class="container">
+                <nav class="navbar navbar-expand-lg bg-white py-3" id="home">
+                    <a class="navbar-brand fw-bold text-primary" href="#home">ChiTiet Dot Wiki</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#primaryNav" aria-controls="primaryNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse justify-content-end" id="primaryNav">
+                        <ul class="navbar-nav align-items-lg-center gap-lg-2 text-uppercase fw-semibold">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="#topics">Topics</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#feedback">Feedback</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#about">About</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#contact">Contact</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#disclaimer">Disclaimer</a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </header>
+        <main>
+            <section class="hero-section py-5 py-md-6 text-center">
+                <div class="container">
+                    <span class="badge rounded-pill text-bg-warning text-uppercase mb-3">Guided learning</span>
+                    <h1 class="display-5 fw-bold mb-3">Search detailed walkthroughs for every niche workflow</h1>
+                    <p class="lead text-muted mb-4">Browse structured guides curated by the ChiTiet Dot community. Filter by topic, discover quick wins, and share knowledge with peers.</p>
+                    <form class="row justify-content-center g-2" id="search-form">
+                        <div class="col-md-6">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search text-primary" viewBox="0 0 16 16" aria-hidden="true">
+                                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.415l-3.85-3.85zm-5.242 1.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"></path>
+                                    </svg>
+                                </span>
+                                <input class="form-control border-start-0" id="search-input" type="search" placeholder="Search topics, tools, or workflows" aria-label="Search topics">
+                            </div>
+                        </div>
+                        <div class="col-md-auto">
+                            <button class="btn btn-primary btn-lg px-4" type="submit">Search</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+            <section class="py-5" id="topics">
+                <div class="container">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
+                        <div class="text-start">
+                            <h2 class="h4 fw-semibold mb-1">Browse featured topics</h2>
+                            <p class="text-muted m-0">Use filters or pagination to discover guides curated by our documentation team.</p>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="text-muted small text-uppercase mb-0" for="sort-select">Sort</label>
+                            <select class="form-select form-select-sm w-auto" id="sort-select" aria-label="Sort topics">
+                                <option value="featured">Featured</option>
+                                <option value="az">A to Z</option>
+                                <option value="recent">Recently Added</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row g-4" id="topics-grid" aria-live="polite">
+                        <!-- Topic cards injected by search.js -->
+                    </div>
+                    <nav class="mt-4" aria-label="Topic pagination">
+                        <ul class="pagination justify-content-center" id="topic-pagination"></ul>
+                    </nav>
+                </div>
+            </section>
+            <section class="py-5 bg-light" id="feedback">
+                <div class="container">
+                    <div class="text-center mb-5">
+                        <h2 class="h4 fw-semibold">What our readers are saying</h2>
+                        <p class="text-muted mx-auto w-lg-50">Testimonials from makers who scaled their projects using ChiTiet Dot guides.</p>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <div class="text-warning mb-2" aria-label="Rated five out of five stars">★★★★★</div>
+                                    <p class="card-text">“Step-by-step guides are spot on. The search makes it painless to locate niche tutorials.”</p>
+                                    <p class="card-text text-muted small mb-0">Linh Tran · SaaS Founder</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <div class="text-warning mb-2" aria-label="Rated five out of five stars">★★★★★</div>
+                                    <p class="card-text">“Mobile layout is slick. I can review workflows on the go without losing my place.”</p>
+                                    <p class="card-text text-muted small mb-0">Haruto Nakamura · Product Lead</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <div class="text-warning mb-2" aria-label="Rated four out of five stars">★★★★☆</div>
+                                    <p class="card-text">“The pagination keeps research organized. Would love an export button next.”</p>
+                                    <p class="card-text text-muted small mb-0">Aisha Bello · Technical Writer</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="py-5" id="about">
+                <div class="container">
+                    <div class="row gy-4">
+                        <div class="col-md-6">
+                            <h2 class="h4 fw-semibold mb-3">About ChiTiet Dot</h2>
+                            <p class="text-muted">We catalog detailed walkthroughs for Vietnam-based creators, engineers, and educators. Every topic is curated, updated, and verified by a distributed team of editors.</p>
+                            <p class="text-muted mb-0">New contributors can submit guides via GitHub pull requests or through our editorial intake at <a href="mailto:hello@chitiet.vn">hello@chitiet.vn</a>.</p>
+                        </div>
+                        <div class="col-md-6" id="contact">
+                            <h3 class="h5 fw-semibold mb-3">Contact</h3>
+                            <ul class="list-unstyled text-muted">
+                                <li class="mb-2">
+                                    <span class="fw-semibold text-dark">Email:</span> <a href="mailto:hello@chitiet.vn" class="text-decoration-none">hello@chitiet.vn</a>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="fw-semibold text-dark">Community:</span> <a href="https://community.chitiet.vn" class="text-decoration-none">community.chitiet.vn</a>
+                                </li>
+                                <li>
+                                    <span class="fw-semibold text-dark">Support hours:</span> Monday to Friday, 9am - 5pm ICT
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="py-5 bg-body-secondary" id="disclaimer">
+                <div class="container text-center">
+                    <h2 class="h5 fw-semibold mb-3">Disclaimer</h2>
+                    <p class="text-muted mb-0">Guides are provided for informational purposes. Always validate configurations in a staging environment before production rollout.</p>
+                </div>
+            </section>
+        </main>
+        <footer class="py-4 border-top">
+            <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                <p class="m-0 text-muted">&copy; <span id="current-year"></span> ChiTiet Dot. All rights reserved.</p>
+                <div class="d-flex gap-3">
+                    <a class="text-decoration-none text-secondary small" href="#topics">Topics</a>
+                    <a class="text-decoration-none text-secondary small" href="#feedback">Feedback</a>
+                    <a class="text-decoration-none text-secondary small" href="#contact">Contact</a>
+                </div>
+            </div>
+        </footer>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        <script src="assets/js/search.js"></script>
+    </body>
+</html>

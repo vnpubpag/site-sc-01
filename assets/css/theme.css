@@ -1,0 +1,134 @@
+:root {
+    --ct-primary: #2266ff;
+    --ct-accent: #ffb703;
+    --ct-muted: #6c757d;
+}
+
+body {
+    font-family: "Inter", "Segoe UI", sans-serif;
+    color: #212529;
+    background: linear-gradient(180deg, #f7f9fc 0%, #ffffff 35%);
+}
+
+.top-bar {
+    letter-spacing: 0.05em;
+}
+
+.hero-section {
+    padding-bottom: 6rem;
+    background-image: radial-gradient(circle at top, rgba(34, 102, 255, 0.08), transparent 55%);
+}
+
+.py-6 {
+    padding-top: 4.5rem !important;
+    padding-bottom: 4.5rem !important;
+}
+
+@media (min-width: 768px) {
+    .py-md-6 {
+        padding-top: 5.5rem !important;
+        padding-bottom: 5.5rem !important;
+    }
+}
+
+.hero-section .badge {
+    letter-spacing: 0.12em;
+}
+
+.hero-section .display-5 {
+    max-width: 60rem;
+    margin: 0 auto;
+}
+
+.hero-section .lead {
+    max-width: 42rem;
+    margin: 0 auto;
+}
+
+.input-group-lg .form-control,
+.input-group-lg .input-group-text {
+    border-color: rgba(34, 102, 255, 0.2);
+}
+
+.input-group-lg .form-control:focus {
+    border-color: var(--ct-primary);
+    box-shadow: 0 0 0 0.25rem rgba(34, 102, 255, 0.15);
+}
+
+.navbar-brand {
+    letter-spacing: 0.03em;
+}
+
+.navbar .nav-link {
+    color: var(--ct-muted);
+}
+
+.navbar .nav-link.active,
+.navbar .nav-link:focus,
+.navbar .nav-link:hover {
+    color: var(--ct-primary);
+}
+
+.card {
+    border-radius: 1rem;
+}
+
+.card .card-title {
+    letter-spacing: 0.08em;
+}
+
+.card .card-text {
+    line-height: 1.6;
+}
+
+#topics-grid .card {
+    border-top: 0.35rem solid rgba(34, 102, 255, 0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#topics-grid .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.75rem 1.5rem rgba(34, 102, 255, 0.12);
+}
+
+.pagination .page-link {
+    color: var(--ct-primary);
+    border-radius: 0.75rem;
+    margin: 0 0.25rem;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--ct-primary);
+    border-color: var(--ct-primary);
+}
+
+.text-warning {
+    letter-spacing: 0.2em;
+}
+
+#feedback .card {
+    background-color: #ffffff;
+}
+
+#about p,
+#about li {
+    max-width: 32rem;
+}
+
+.bg-body-secondary {
+    background-color: #f2f5f9 !important;
+}
+
+.w-lg-50 {
+    width: 100%;
+}
+
+@media (min-width: 992px) {
+    .w-lg-50 {
+        width: 50%;
+    }
+}
+
+footer {
+    background-color: #ffffff;
+}

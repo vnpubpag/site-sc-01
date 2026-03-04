@@ -448,18 +448,24 @@ h3 {
     display: grid;
     gap: 16px;
 }
-.cards-grid--static,
+.cards-grid--learn,
+.cards-grid--guide,
+.cards-grid--fun,
 .cards-grid--tools {
     grid-template-columns: repeat(2, 1fr);
 }
 @media (min-width: 640px) {
-    .cards-grid--static,
+    .cards-grid--learn,
+    .cards-grid--guide,
+    .cards-grid--fun,
     .cards-grid--tools {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 @media (min-width: 1024px) {
-    .cards-grid--static,
+    .cards-grid--learn,
+    .cards-grid--guide,
+    .cards-grid--fun,
     .cards-grid--tools {
         grid-template-columns: repeat(4, 1fr);
     }

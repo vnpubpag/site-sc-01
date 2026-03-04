@@ -486,18 +486,24 @@ h3 {
     display: grid;
     gap: 16px;
 }
-.cards-grid--static,
+.cards-grid--learn,
+.cards-grid--guide,
+.cards-grid--fun,
 .cards-grid--tools {
     grid-template-columns: repeat(2, 1fr);
 }
 @media (min-width: 640px) {
-    .cards-grid--static,
+    .cards-grid--learn,
+    .cards-grid--guide,
+    .cards-grid--fun,
     .cards-grid--tools {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 @media (min-width: 1024px) {
-    .cards-grid--static,
+    .cards-grid--learn,
+    .cards-grid--guide,
+    .cards-grid--fun,
     .cards-grid--tools {
         grid-template-columns: repeat(4, 1fr);
     }
@@ -564,9 +570,10 @@ h3 {
     color: var(--ct-accent);
 }
 
-/* Tool / Fun card: icon-centered style */
+/* Tool / Fun / Learn card: icon-centered style */
 .card--tool,
-.card--fun {
+.card--fun,
+.card--learn {
     padding: 24px 16px;
     align-items: center;
     text-align: center;

@@ -15,6 +15,7 @@
     --ct-text-muted: #94a3b8;
     --ct-border: #334155;
     --ct-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --ct-grid: rgba(148, 163, 184, 0.05);
 }
 
 *,
@@ -34,6 +35,10 @@ body {
     line-height: 1.7;
     background-color: var(--ct-bg);
     color: var(--ct-text-main);
+    background-image:
+        linear-gradient(var(--ct-grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--ct-grid) 1px, transparent 1px);
+    background-size: 32px 32px;
 }
 a {
     color: inherit;
@@ -180,6 +185,7 @@ h3 {
 /* Hero */
 .hero {
     background-color: var(--ct-bg-soft);
+    background-image: radial-gradient(ellipse at 50% 0%, rgba(96, 165, 250, 0.06) 0%, transparent 70%);
     padding: 64px 24px 52px;
 }
 .hero__inner {

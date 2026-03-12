@@ -242,14 +242,27 @@ h3 {
     max-width: 680px;
     padding: 3px;
     border-radius: 16px;
-    background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899, #f97316, #6366f1);
+    background: linear-gradient(
+        135deg,
+        #6366f1,
+        #a855f7,
+        #ec4899,
+        #f97316,
+        #6366f1
+    );
     background-size: 300% 300%;
     animation: hero-glow 6s ease infinite;
 }
 @keyframes hero-glow {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 .hero__search {
     display: flex;
@@ -324,8 +337,13 @@ h3 {
     animation: hero-pulse 2s ease-in-out infinite;
 }
 @keyframes hero-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.4;
+    }
 }
 .hero__feed-label {
     font-size: 13px;
@@ -353,7 +371,9 @@ h3 {
     background-color: var(--ct-bg);
     border: 1px solid var(--ct-border);
     border-radius: 9999px;
-    transition: border-color 200ms, background-color 200ms;
+    transition:
+        border-color 200ms,
+        background-color 200ms;
 }
 .hero__feed-item:hover {
     border-color: var(--ct-accent);
@@ -532,17 +552,37 @@ h3 {
     gap: 8px;
 }
 .card__title {
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 19px;
+    font-weight: 600;
     color: var(--ct-text-main);
-    line-height: 1.4;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    transition: color 0.3s ease, background-size 0.4s ease;
+    background-size: 100% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
 }
 .card:hover .card__title {
-    color: var(--ct-accent);
+    color: transparent;
+    background-image: linear-gradient(
+        135deg,
+        var(--ct-accent) 0%,
+        #a78bfa 40%,
+        #f472b6 60%,
+        var(--ct-accent) 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: twinkle-shift 2s ease-in-out infinite;
+}
+@keyframes twinkle-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
 }
 
 /* Tool / Fun / Learn card: icon-centered style */
@@ -570,9 +610,10 @@ h3 {
     line-height: 1;
 }
 .card--tool .card__title,
-.card--fun .card__title {
-    font-size: 14px;
-    font-weight: 700;
+.card--fun .card__title,
+.card--learn .card__title {
+    font-size: 17px;
+    font-weight: 600;
     margin-bottom: 4px;
 }
 .card__desc {
@@ -715,7 +756,6 @@ h3 {
     font-size: 14px;
     line-height: 1.7;
     opacity: 0.45;
-    max-width: 640px;
 }
 .site-footer__copyright {
     margin-top: 8px;

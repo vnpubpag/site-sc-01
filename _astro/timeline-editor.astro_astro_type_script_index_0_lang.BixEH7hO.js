@@ -1,4 +1,62 @@
-import{_ as $}from"./preload-helper.CVfkMyKi.js";const y="chitiet_timeline_events",k="#2563eb";let r={events:[]},p=null,f=!1,v=!0,m=!1;function o(t){return document.getElementById(t)}function E(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}function T(){try{const t=localStorage.getItem(y);if(t){const e=JSON.parse(t);e&&Array.isArray(e.events)&&(r=e)}}catch{r={events:[]}}}function b(){localStorage.setItem(y,JSON.stringify(r))}function g(){const t=o("tl-events"),e=o("tl-empty");if(!t||!e)return;if(r.events.length===0){t.innerHTML="",e.classList.add("tl-empty--visible");return}e.classList.remove("tl-empty--visible");const n=[...r.events].sort((i,l)=>{const s=new Date(i.time).getTime(),a=new Date(l.time).getTime();return isNaN(s)&&isNaN(a)?0:isNaN(s)?1:isNaN(a)?-1:s-a});t.innerHTML=n.map(i=>x(i)).join(""),t.querySelectorAll("[data-action]").forEach(i=>{i.addEventListener("click",A)}),t.querySelectorAll(".tl-color-input").forEach(i=>{i.addEventListener("input",D),i.addEventListener("change",N)})}function S(t){const e=parseInt(t.slice(1,3),16),n=parseInt(t.slice(3,5),16),i=parseInt(t.slice(5,7),16);return{r:e,g:n,b:i}}function x(t){const e=t.side==="right"?"tl-item--right":"tl-item--left",n=/^#[0-9a-fA-F]{6}$/.test(t.color||"")?t.color:k,{r:i,g:l,b:s}=S(n),a=h(t.title),c=h(t.description),d=C(t.time);return`
+import { _ as $ } from "./preload-helper.CVfkMyKi.js";
+(async ()=>{
+    const y = "chitiet_timeline_events", k = "#2563eb";
+    let r = {
+        events: []
+    }, p = null, f = !1, v = !0, m = !1;
+    function o(t) {
+        return document.getElementById(t);
+    }
+    function E() {
+        return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
+    function T() {
+        try {
+            const t = localStorage.getItem(y);
+            if (t) {
+                const e = JSON.parse(t);
+                e && Array.isArray(e.events) && (r = e);
+            }
+        } catch  {
+            r = {
+                events: []
+            };
+        }
+    }
+    function b() {
+        localStorage.setItem(y, JSON.stringify(r));
+    }
+    function g() {
+        const t = o("tl-events"), e = o("tl-empty");
+        if (!t || !e) return;
+        if (r.events.length === 0) {
+            t.innerHTML = "", e.classList.add("tl-empty--visible");
+            return;
+        }
+        e.classList.remove("tl-empty--visible");
+        const n = [
+            ...r.events
+        ].sort((i, l)=>{
+            const s = new Date(i.time).getTime(), a = new Date(l.time).getTime();
+            return isNaN(s) && isNaN(a) ? 0 : isNaN(s) ? 1 : isNaN(a) ? -1 : s - a;
+        });
+        t.innerHTML = n.map((i)=>x(i)).join(""), t.querySelectorAll("[data-action]").forEach((i)=>{
+            i.addEventListener("click", A);
+        }), t.querySelectorAll(".tl-color-input").forEach((i)=>{
+            i.addEventListener("input", D), i.addEventListener("change", N);
+        });
+    }
+    function S(t) {
+        const e = parseInt(t.slice(1, 3), 16), n = parseInt(t.slice(3, 5), 16), i = parseInt(t.slice(5, 7), 16);
+        return {
+            r: e,
+            g: n,
+            b: i
+        };
+    }
+    function x(t) {
+        const e = t.side === "right" ? "tl-item--right" : "tl-item--left", n = /^#[0-9a-fA-F]{6}$/.test(t.color || "") ? t.color : k, { r: i, g: l, b: s } = S(n), a = h(t.title), c = h(t.description), d = C(t.time);
+        return `
         <div class="tl-item ${e}" data-id="${t.id}" style="--tl-event-color: ${n}; --tl-color-10: rgba(${i},${l},${s},0.1); --tl-color-20: rgba(${i},${l},${s},0.2); --tl-color-30: rgba(${i},${l},${s},0.3)">
             <div class="tl-item__content">
                 <div class="tl-card__actions">
@@ -24,7 +82,7 @@ import{_ as $}from"./preload-helper.CVfkMyKi.js";const y="chitiet_timeline_event
                     <div class="tl-card__header">
                         <h4 class="tl-card__title">${a}</h4>
                     </div>
-                    ${c?`<p class="tl-card__desc">${c}</p>`:""}
+                    ${c ? `<p class="tl-card__desc">${c}</p>` : ""}
                 </div>
             </div>
             <div class="tl-item__center">
@@ -34,4 +92,140 @@ import{_ as $}from"./preload-helper.CVfkMyKi.js";const y="chitiet_timeline_event
                 <span class="tl-time-label">${d}</span>
             </div>
         </div>
-    `}function h(t){const e=document.createElement("div");return e.textContent=t,e.innerHTML}function C(t){const e=new Date(t);if(isNaN(e.getTime()))return h(t);const n={day:"2-digit",month:"2-digit",year:"numeric"};return v&&(n.hour="2-digit",n.minute="2-digit"),e.toLocaleString("vi-VN",n)}function _(t,e){const n=o("tl-modal-overlay"),i=o("tl-modal-title"),l=o("tl-input-time"),s=o("tl-input-title"),a=o("tl-input-desc");if(!(!n||!i||!l||!s||!a)){if(t==="edit"&&e){p=e.id,i.textContent="Sửa sự kiện",l.value=e.time,s.value=e.title,a.value=e.description;const c=document.querySelector(`input[name="tl-side"][value="${e.side}"]`);c&&(c.checked=!0)}else{p=null,i.textContent="Thêm sự kiện",l.value="",s.value="",a.value="";const c=document.querySelector('input[name="tl-side"][value="left"]');c&&(c.checked=!0)}n.classList.add("tl-modal-overlay--open"),l.focus()}}function L(){const t=o("tl-modal-overlay");t&&t.classList.remove("tl-modal-overlay--open"),p=null}function A(t){const e=t.currentTarget,n=e.getAttribute("data-action"),i=e.getAttribute("data-id");if(!(!n||!i))if(n==="edit"){const l=r.events.find(s=>s.id===i);l&&_("edit",l)}else n==="delete"&&confirm("Bạn có chắc muốn xóa sự kiện này?")&&(r.events=r.events.filter(l=>l.id!==i),b(),g())}function D(t){const e=t.currentTarget,n=e.getAttribute("data-id");if(!n)return;const i=o("tl-events");if(!i)return;const l=i.querySelector(`.tl-item[data-id="${n}"]`);l&&l.style.setProperty("--tl-event-color",e.value)}function N(t){const e=t.currentTarget,n=e.getAttribute("data-id");if(!n)return;const i=r.events.find(l=>l.id===n);i&&(i.color=e.value,b(),g())}function B(t){t.preventDefault();const e=o("tl-input-time"),n=o("tl-input-title"),i=o("tl-input-desc"),l=document.querySelector('input[name="tl-side"]:checked');if(!e||!n||!i||!l)return;const s=e.value.trim(),a=n.value.trim(),c=i.value.trim(),d=l.value;if(!(!s||!a)){if(p){const u=r.events.find(w=>w.id===p);u&&(u.time=s,u.title=a,u.description=c,u.side=d)}else r.events.push({id:E(),time:s,title:a,description:c,side:d});b(),g(),L()}}function I(){f=!f;const t=o("tl-timeline"),e=o("tl-font-label"),n=o("tl-font-btn");t&&t.classList.toggle("tl-timeline--sm",f),e&&(e.textContent=f?"Chữ thường":"Chữ nhỏ"),n&&n.classList.toggle("tl-btn--active",f)}function M(){v=!v;const t=o("tl-time-style-label"),e=o("tl-time-style-btn");t&&(t.textContent=v?"Ẩn giờ":"Hiện giờ"),e&&e.classList.toggle("tl-btn--active",!v),g()}function H(){m=!m;const t=o("tl-timeline"),e=o("tl-layout-label"),n=o("tl-layout-btn");t&&t.classList.toggle("tl-timeline--horizontal",m),e&&(e.textContent=m?"Dọc":"Ngang"),n&&n.classList.toggle("tl-btn--active",m)}async function R(){const t=o("tl-timeline");if(!t||r.events.length===0)return;const e=o("tl-export-btn");e&&(e.setAttribute("disabled","true"),e.style.opacity="0.5");const n=t.classList.contains("tl-timeline--horizontal");let i=null;n&&(i={overflow:t.style.overflow,width:t.style.width},t.style.overflow="visible",t.style.width=`${t.scrollWidth}px`);try{const{toPng:l}=await $(async()=>{const{toPng:c}=await import("./index.BeoRn2gJ.js");return{toPng:c}},[]),s=await l(t,{backgroundColor:"#ffffff",pixelRatio:2}),a=document.createElement("a");a.download="timeline.png",a.href=s,a.click()}catch(l){console.error("Error exporting image:",l),alert("Không thể xuất ảnh. Vui lòng thử lại.")}finally{n&&i&&(t.style.overflow=i.overflow,t.style.width=i.width),e&&(e.removeAttribute("disabled"),e.style.opacity="")}}function O(){T(),g();const t=o("tl-add-btn");t&&t.addEventListener("click",()=>_("add"));const e=o("tl-form");e&&e.addEventListener("submit",B);const n=o("tl-cancel-btn");n&&n.addEventListener("click",L);const i=o("tl-font-btn");i&&i.addEventListener("click",I);const l=o("tl-time-style-btn");l&&l.addEventListener("click",M);const s=o("tl-layout-btn");s&&s.addEventListener("click",H);const a=o("tl-export-btn");a&&a.addEventListener("click",R)}document.addEventListener("DOMContentLoaded",O);
+    `;
+    }
+    function h(t) {
+        const e = document.createElement("div");
+        return e.textContent = t, e.innerHTML;
+    }
+    function C(t) {
+        const e = new Date(t);
+        if (isNaN(e.getTime())) return h(t);
+        const n = {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        };
+        return v && (n.hour = "2-digit", n.minute = "2-digit"), e.toLocaleString("vi-VN", n);
+    }
+    function _(t, e) {
+        const n = o("tl-modal-overlay"), i = o("tl-modal-title"), l = o("tl-input-time"), s = o("tl-input-title"), a = o("tl-input-desc");
+        if (!(!n || !i || !l || !s || !a)) {
+            if (t === "edit" && e) {
+                p = e.id, i.textContent = "Sửa sự kiện", l.value = e.time, s.value = e.title, a.value = e.description;
+                const c = document.querySelector(`input[name="tl-side"][value="${e.side}"]`);
+                c && (c.checked = !0);
+            } else {
+                p = null, i.textContent = "Thêm sự kiện", l.value = "", s.value = "", a.value = "";
+                const c = document.querySelector('input[name="tl-side"][value="left"]');
+                c && (c.checked = !0);
+            }
+            n.classList.add("tl-modal-overlay--open"), l.focus();
+        }
+    }
+    function L() {
+        const t = o("tl-modal-overlay");
+        t && t.classList.remove("tl-modal-overlay--open"), p = null;
+    }
+    function A(t) {
+        const e = t.currentTarget, n = e.getAttribute("data-action"), i = e.getAttribute("data-id");
+        if (!(!n || !i)) if (n === "edit") {
+            const l = r.events.find((s)=>s.id === i);
+            l && _("edit", l);
+        } else n === "delete" && confirm("Bạn có chắc muốn xóa sự kiện này?") && (r.events = r.events.filter((l)=>l.id !== i), b(), g());
+    }
+    function D(t) {
+        const e = t.currentTarget, n = e.getAttribute("data-id");
+        if (!n) return;
+        const i = o("tl-events");
+        if (!i) return;
+        const l = i.querySelector(`.tl-item[data-id="${n}"]`);
+        l && l.style.setProperty("--tl-event-color", e.value);
+    }
+    function N(t) {
+        const e = t.currentTarget, n = e.getAttribute("data-id");
+        if (!n) return;
+        const i = r.events.find((l)=>l.id === n);
+        i && (i.color = e.value, b(), g());
+    }
+    function B(t) {
+        t.preventDefault();
+        const e = o("tl-input-time"), n = o("tl-input-title"), i = o("tl-input-desc"), l = document.querySelector('input[name="tl-side"]:checked');
+        if (!e || !n || !i || !l) return;
+        const s = e.value.trim(), a = n.value.trim(), c = i.value.trim(), d = l.value;
+        if (!(!s || !a)) {
+            if (p) {
+                const u = r.events.find((w)=>w.id === p);
+                u && (u.time = s, u.title = a, u.description = c, u.side = d);
+            } else r.events.push({
+                id: E(),
+                time: s,
+                title: a,
+                description: c,
+                side: d
+            });
+            b(), g(), L();
+        }
+    }
+    function I() {
+        f = !f;
+        const t = o("tl-timeline"), e = o("tl-font-label"), n = o("tl-font-btn");
+        t && t.classList.toggle("tl-timeline--sm", f), e && (e.textContent = f ? "Chữ thường" : "Chữ nhỏ"), n && n.classList.toggle("tl-btn--active", f);
+    }
+    function M() {
+        v = !v;
+        const t = o("tl-time-style-label"), e = o("tl-time-style-btn");
+        t && (t.textContent = v ? "Ẩn giờ" : "Hiện giờ"), e && e.classList.toggle("tl-btn--active", !v), g();
+    }
+    function H() {
+        m = !m;
+        const t = o("tl-timeline"), e = o("tl-layout-label"), n = o("tl-layout-btn");
+        t && t.classList.toggle("tl-timeline--horizontal", m), e && (e.textContent = m ? "Dọc" : "Ngang"), n && n.classList.toggle("tl-btn--active", m);
+    }
+    async function R() {
+        const t = o("tl-timeline");
+        if (!t || r.events.length === 0) return;
+        const e = o("tl-export-btn");
+        e && (e.setAttribute("disabled", "true"), e.style.opacity = "0.5");
+        const n = t.classList.contains("tl-timeline--horizontal");
+        let i = null;
+        n && (i = {
+            overflow: t.style.overflow,
+            width: t.style.width
+        }, t.style.overflow = "visible", t.style.width = `${t.scrollWidth}px`);
+        try {
+            const { toPng: l } = await $(async ()=>{
+                const { toPng: c } = await import("./index.BeoRn2gJ.js");
+                return {
+                    toPng: c
+                };
+            }, []), s = await l(t, {
+                backgroundColor: "#ffffff",
+                pixelRatio: 2
+            }), a = document.createElement("a");
+            a.download = "timeline.png", a.href = s, a.click();
+        } catch (l) {
+            console.error("Error exporting image:", l), alert("Không thể xuất ảnh. Vui lòng thử lại.");
+        } finally{
+            n && i && (t.style.overflow = i.overflow, t.style.width = i.width), e && (e.removeAttribute("disabled"), e.style.opacity = "");
+        }
+    }
+    function O() {
+        T(), g();
+        const t = o("tl-add-btn");
+        t && t.addEventListener("click", ()=>_("add"));
+        const e = o("tl-form");
+        e && e.addEventListener("submit", B);
+        const n = o("tl-cancel-btn");
+        n && n.addEventListener("click", L);
+        const i = o("tl-font-btn");
+        i && i.addEventListener("click", I);
+        const l = o("tl-time-style-btn");
+        l && l.addEventListener("click", M);
+        const s = o("tl-layout-btn");
+        s && s.addEventListener("click", H);
+        const a = o("tl-export-btn");
+        a && a.addEventListener("click", R);
+    }
+    document.addEventListener("DOMContentLoaded", O);
+})();

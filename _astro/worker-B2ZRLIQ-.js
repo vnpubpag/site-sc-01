@@ -1,1 +1,1117 @@
-async function U(){const t=await import("./pdf-C_7zF4kU.js");return t.GlobalWorkerOptions.workerSrc=`https://unpkg.com/pdfjs-dist@${t.version}/build/pdf.worker.min.mjs`,t}async function W(t,o){return await t.getDocument({data:o}).promise}function $(t,o=[]){const e=(t||"").toLowerCase(),s=e.replace(/[^a-z0-9]/g," "),n=s.split(/\s+/).filter(Boolean),a=n.some(d=>/^(bold|black|heavy|demi|semibold|ultrabold|extrabold|bd|sb)$/.test(d)),c=n.some(d=>/^(italic|oblique|slant|slanted)$/.test(d)),u=/boldit|itbold|hb|blackit/.test(e),i=/\bit\b/.test(s)||/\bbi\b/.test(s)||/bolditalic|italicbold|obliqueitalic|italicoblique/.test(e),f=a||u,l=Math.abs(o[0]||1),r=o[1]||0,h=o[2]||0,p=Math.abs(o[3]||1),m=Math.abs(h)>.05*l&&l>.1||Math.abs(r)>.05*p&&p>.1;return{bold:f,italic:c||i||m}}function V(t){const o=[];for(const e of t.items){if(!e.str||!e.str.trim()||!e.transform)continue;const s=Math.abs(e.transform[0])||Math.abs(e.transform[3]),n=e.fontName||"",a=$(n,e.transform);o.push({str:e.str.replace(/[\r\n]+/g," "),x:e.transform[4],y:e.transform[5],width:e.width||0,height:e.height||s,fontSize:s,fontName:n,isBold:a.bold,isItalic:a.italic})}return o}function F(t,o,e,s){const n=Math.max(1,o-t);if(n>e*.65)return"left";const a=Math.max(0,t),c=Math.max(0,e-o),u=Math.max(e*.025,Math.max(s*1.8,14));if(c<u&&a>e*.12&&n<e*.85)return"right";const i=Math.abs(a-c),f=(t+o)/2,l=e/2;return n<e*.55&&i<=u&&a>e*.03&&c>e*.03||n<e*.55&&Math.abs(f-l)<=s?"center":"left"}function R(t,o){const e=[];for(let i=0;i<t.length;i++){if(i>0&&t[i].segments.length>0){const f=e[e.length-1],l=t[i].segments[0];if(f&&f.bold===l.bold&&f.italic===l.italic){f.text+=" "+l.text;for(let r=1;r<t[i].segments.length;r++)e.push({...t[i].segments[r]});continue}f&&(f.text+=" ")}for(const f of t[i].segments)e.push({...f})}const s=e.map(i=>i.text).join("").trim(),n=t.reduce((i,f)=>i+f.fontSize,0)/t.length,a=n>o*1.2&&s.length<200&&t.length<=3;let c=t[0].alignment;if(t.length>1){const i=t.map(d=>d.xStart),f=t.map(d=>d.xEnd),l=t.map(d=>(d.xStart+d.xEnd)/2),r=d=>Math.max(...d)-Math.min(...d),h=r(i),p=r(f),m=r(l),g=Math.min(h,m,p);g===m?c="center":g===p?c="right":c="left"}const u=t.reduce((i,f)=>i+f.xStart,0)/t.length;return a?{type:"heading",segments:e,text:s,headingLevel:n>o*1.5?1:2,fontSize:n,xStart:u,alignment:c,y:t[0].y}:{type:"paragraph",segments:e,text:s,fontSize:n,xStart:u,alignment:c,y:t[0].y}}function q(t,o,e){if(t.length===0)return[];if(o){const a=t.filter(i=>i.text);if(a.length===0)return[];const c=[];let u=[a[0]];for(let i=1;i<a.length;i++){const f=u[u.length-1],l=a[i],r=/^\p{Ll}/u.test(l.text),h=/[.:;?!]$/.test(f.text.trimEnd()),p=l.fontSize>e*1.2,m=f.y-l.y,g=m>0&&m<=f.fontSize*3,d=l.xStart>f.xStart+f.fontSize*2;r&&!h&&!p&&g&&!d?u.push(l):(c.push(u),u=[l])}return u.length>0&&c.push(u),c.map(i=>R(i,e))}const s=[];let n=[t[0]];for(let a=1;a<t.length;a++){const c=t[a-1],u=t[a],i=c.y-u.y,f=(c.fontSize+u.fontSize)/2,l=u.xStart-c.xStart>c.fontSize,r=c.xStart-u.xStart>u.fontSize;let h=i>f*2||Math.abs(u.fontSize-c.fontSize)>1.5||u.fontSize>e*1.2||l||r;if(h){const p=/^\p{Ll}/u.test(u.text),m=/[.:;?!]$/.test(c.text.trimEnd()),g=i>0&&i<=f*3;p&&!m&&g&&(h=!1)}h?(s.push(R(n,e)),n=[u]):n.push(u)}return n.length>0&&s.push(R(n,e)),s}function k(t){const o=[];let e=null;for(let n=0;n<t.length;n++){let a="";n>0&&t[n].x-(t[n-1].x+t[n-1].width)>t[n].fontSize*.25&&(a=" ");const c=t[n];e&&e.bold===c.isBold&&e.italic===c.isItalic?e.text+=a+c.str:(e&&a&&(e.text+=a),e={text:(e&&a?"":a)+c.str,bold:c.isBold,italic:c.isItalic},o.push(e))}const s=o.map(n=>n.text).join("").trim();return{xStart:t[0].x,xEnd:t[t.length-1].x+t[t.length-1].width,text:s,segments:o}}function D(t,o){t.sort((r,h)=>r.x-h.x);const e=[];let s=null;const n=[];let a=[t[0]];for(let r=1;r<t.length;r++)t[r].x-(t[r-1].x+t[r-1].width)>t[r].fontSize*2?(n.push(k(a)),a=[t[r]]):a.push(t[r]);a.length>0&&n.push(k(a));for(let r=0;r<t.length;r++){let h="";r>0&&t[r].x-(t[r-1].x+t[r-1].width)>t[r].fontSize*.25&&(h=" ");const p=t[r];s&&s.bold===p.isBold&&s.italic===p.isItalic?s.text+=h+p.str:(s&&h&&(s.text+=h),s={text:(s&&h?"":h)+p.str,bold:p.isBold,italic:p.isItalic},e.push(s))}const c=e.map(r=>r.text).join("").trim(),u=t.reduce((r,h)=>r+h.fontSize,0)/t.length,i=t[0].x,f=t[t.length-1],l=f.x+f.width;return{segments:e,segmentGroups:n,text:c,y:t[0].y,fontSize:u,xStart:i,xEnd:l,alignment:F(i,l,o,u)}}function J(t,o){if(t.length===0)return[];t.sort((n,a)=>a.y-n.y||n.x-a.x);const e=[];let s=[t[0]];for(let n=1;n<t.length;n++){const a=t[n],c=s[0].y,u=Math.max(a.fontSize,s[0].fontSize)*.5;Math.abs(a.y-c)>u?(e.push(D(s,o)),s=[a]):s.push(a)}return s.length>0&&e.push(D(s,o)),e}function Q(t){for(let o=0;o<t.length-1;o++){const e=t[o],s=t[o+1];if(e.text.endsWith("-")&&/^\p{L}/u.test(s.text)){e.text=e.text.slice(0,-1);const n=e.segments[e.segments.length-1];n&&n.text.endsWith("-")&&(n.text=n.text.slice(0,-1)),s.noLeadingSpace=!0}}return t}function Z(t){const o=t.map(s=>s.fontSize).sort((s,n)=>s-n);if(o.length===0)return 12;const e=Math.floor(o.length/2);return o.length%2===0?(o[e-1]+o[e])/2:o[e]}function K(t,o){const e=t.filter(i=>i.xEnd-i.xStart<o*.55);if(e.length<4)return[];const s=e.map(i=>i.xStart).sort((i,f)=>i-f),n=o*.15,a=[];let c=[s[0]];for(let i=1;i<s.length;i++)s[i]-s[i-1]>n?(a.push(c),c=[s[i]]):c.push(s[i]);a.push(c);const u=a.filter(i=>i.length>=2);return u.length<=1?[]:u.map(i=>i.reduce((f,l)=>f+l,0)/i.length).sort((i,f)=>i-f)}function j(t,o){if(t.length<=2)return t;const e=K(t,o);if(e.length<=1)return t;const s=t.length,n=Math.max(...t.map(r=>r.y)),a=t.map(r=>{if(r.xEnd-r.xStart>=o*.55)return-1;let h=0,p=1/0;for(let m=0;m<e.length;m++){const g=Math.abs(r.xStart-e[m]);g<p&&(p=g,h=m)}return h}),c=(r,h)=>{const p=t[r],m=t[h],g=a[r],d=a[h],x=(p.fontSize+m.fontSize)/2,S=p.y-m.y;let b=0;return b-=Math.abs(p.fontSize-m.fontSize)*2,g===d?(b+=100,S>0?(b+=50,b-=S/(x*2)):b-=200,Math.abs(p.xStart-m.xStart)<x&&(b+=5)):g>=0&&d>=0&&d===g+1?(b+=40,b+=m.y/(n||1)*30):g>=0&&d>=0&&d>g?(b-=20,b+=m.y/(n||1)*10):d===-1||g===-1?(b+=20,S>0?b+=20:b-=50):b-=150,b},u=new Array(s).fill(!1),i=[];let f=0;for(let r=1;r<s;r++){const h=a[r]<0?0:a[r],p=a[f]<0?0:a[f];(h<p||h===p&&t[r].y>t[f].y)&&(f=r)}let l=f;for(;i.length<s;){u[l]=!0,i.push(t[l]);let r=-1,h=-1/0;for(let p=0;p<s;p++){if(u[p])continue;const m=c(l,p);m>h&&(h=m,r=p)}if(r===-1)break;l=r}for(let r=0;r<s;r++)u[r]||i.push(t[r]);return i}const G=/^[•◦\-–*]\s+/,X=/^(\d+[.)]\s+|[a-zA-Z][.)]\s+)/;function tt(t,o){const e=[];let s=o;for(const n of t){if(s>=n.text.length){s-=n.text.length;continue}s>0?(e.push({...n,text:n.text.slice(s)}),s=0):e.push({...n})}return e}function et(t,o){if(o.length===0)return;const e=t[t.length-1],s=o[0];if(e&&e.bold===s.bold&&e.italic===s.italic){e.text+=" "+s.text;for(let n=1;n<o.length;n++)t.push({...o[n]})}else{e&&(e.text+=" ");for(const n of o)t.push({...n})}}function nt(t,o){const e=new Set,s=[];let n=0;for(;n<t.length;){const a=t[n];if(a.fontSize>o*1.2){n++;continue}const c=G.exec(a.text),u=X.exec(a.text);if(!c&&!u){n++;continue}const i=c?"bullet":"numbered",f=c?G:X,l=a.xStart,r=[];for(;n<t.length;){const h=t[n],p=f.exec(h.text);if(p&&Math.abs(h.xStart-l)<h.fontSize*3){const m=tt(h.segments,p[0].length),g=h.text.slice(p[0].length),d=Math.max(0,Math.round((h.xStart-l)/(h.fontSize*2)));r.push({segments:m,text:g,level:d}),e.add(n),n++}else if(r.length>0&&h.xStart>l+h.fontSize&&h.fontSize<=o*1.2){const m=r[r.length-1];m.text+=" "+h.text,et(m.segments,h.segments),e.add(n),n++}else break}r.length>=1?s.push({type:"list",listType:i,items:r,alignment:a.alignment,y:a.y}):e.clear()}return{consumed:e,blocks:s}}function st(t,o,e){const s=new Set,n=[];let a=0;for(;a<t.length;){if(t[a].segmentGroups.length<3){a++;continue}const c=a;for(;a<t.length&&t[a].segmentGroups.length>=3&&t[a].fontSize<=e*1.2;)a++;const u=a;if(u-c<3)continue;const i=t.slice(c,u),f=[];for(const g of i)for(const d of g.segmentGroups)f.push((d.xStart+d.xEnd)/2);f.sort((g,d)=>g-d);const l=e*2,r=[];let h=[f[0]];for(let g=1;g<f.length;g++)if(f[g]-f[g-1]<=l)h.push(f[g]);else{const d=h.reduce((x,S)=>x+S,0)/h.length;r.push({x:d,tolerance:l}),h=[f[g]]}if(h.length>0){const g=h.reduce((d,x)=>d+x,0)/h.length;r.push({x:g,tolerance:l})}if(r.length<3)continue;if(r.length>=3){const g=[];for(let S=1;S<r.length;S++)g.push(r[S].x-r[S-1].x);const d=Math.min(...g),x=Math.max(...g);if(d>0&&x/d>3)continue}let p=0;for(const g of i){let d=0;for(const x of g.segmentGroups){const S=(x.xStart+x.xEnd)/2;r.some(b=>Math.abs(S-b.x)<=b.tolerance)&&d++}d>=3&&p++}if(p<i.length*.7)continue;const m=[];for(const g of i){const d=r.map(()=>({segments:[],text:""}));for(const x of g.segmentGroups){const S=(x.xStart+x.xEnd)/2;let b=0,C=1/0;for(let I=0;I<r.length;I++){const w=Math.abs(S-r[I].x);w<C&&(C=w,b=I)}d[b]={segments:x.segments.map(I=>({...I})),text:x.text}}m.push({cells:d})}for(let g=c;g<u;g++)s.add(g);n.push({type:"table",rows:m,columnCount:r.length,alignment:"left",y:i[0].y})}return{consumed:s,blocks:n}}function P(t,o,e){return[t[0]*o+t[2]*e+t[4],t[1]*o+t[3]*e+t[5]]}function ot(t,o,e,s,n,a,c){return[t[0]*o+t[2]*e,t[1]*o+t[3]*e,t[0]*s+t[2]*n,t[1]*s+t[3]*n,t[0]*a+t[2]*c+t[4],t[1]*a+t[3]*c+t[5]]}function H(t,o,e,s,n,a,c){Math.sqrt((e-t)**2+(s-o)**2)<3||(Math.abs(o-s)<=n?a.push({x1:Math.min(t,e),y1:(o+s)/2,x2:Math.max(t,e),y2:(o+s)/2}):Math.abs(t-e)<=n&&c.push({x1:(t+e)/2,y1:Math.min(o,s),x2:(t+e)/2,y2:Math.max(o,s)}))}const at=0,rt=1,it=2,ct=3,lt=4;function ft(t,o,e,s,n){let a=0,c=0,u=0,i=0,f=0;for(;f<t.length;){const l=t[f++]|0;if(l===at)a=t[f++],c=t[f++],u=a,i=c;else if(l===rt){const r=t[f++],h=t[f++],[p,m]=P(o,a,c),[g,d]=P(o,r,h);H(p,m,g,d,e,s,n),a=r,c=h}else if(l===it)a=t[f+4],c=t[f+5],f+=6;else if(l===ct)a=t[f+2],c=t[f+3],f+=4;else if(l===lt){if(a!==u||c!==i){const[r,h]=P(o,a,c),[p,m]=P(o,u,i);H(r,h,p,m,e,s,n)}a=u,c=i}else break}}function ht(t,o){const e=[],s=[];let a=[1,0,0,1,0,0];const c=[];for(let u=0;u<t.fnArray.length;u++){const i=t.fnArray[u],f=t.argsArray[u];if(i===o.OPS.transform){a=ot(a,f[0],f[1],f[2],f[3],f[4],f[5]);continue}if(i===o.OPS.save){c.push([...a]);continue}if(i===o.OPS.restore&&c.length>0){a=c.pop();continue}if(i===o.OPS.constructPath){const l=f[1],r=Array.isArray(l)?l[0]:l;r&&typeof r.length=="number"&&r.length>0&&ft(r,a,1.5,e,s)}}return{horizontal:e,vertical:s}}function _(t,o){if(t.length===0)return[];t.sort((s,n)=>s-n);const e=[[t[0]]];for(let s=1;s<t.length;s++){const n=e[e.length-1];t[s]-n[n.length-1]<=o?n.push(t[s]):e.push([t[s]])}return e.map(s=>s.reduce((n,a)=>n+a,0)/s.length)}function ut(t,o,e,s){const c=t.filter(d=>d.y1>2&&d.y1<s-2),u=o.filter(d=>d.x1>2&&d.x1<e-2),i=_(c.map(d=>d.y1),3),f=_(u.map(d=>d.x1),3);if(i.length<3||f.length<3)return[];const l=f[0],r=f[f.length-1],h=i[0],p=i[i.length-1],m=r-l,g=p-h;return m<30||g<30?[]:c.length<i.length*2?[]:u.length<f.length*2?[]:[{rowYs:[...i].sort((d,x)=>x-d),colXs:f}]}function gt(t,o,e,s,n){const a=new Set,c=[],{horizontal:u,vertical:i}=ht(t,o),f=ut(u,i,s,n);if(f.length===0)return{tables:c,consumedIndices:a};for(const l of f){const r=l.rowYs.length-1,h=l.colXs.length-1;if(r<1||h<1)continue;const p=l.rowYs[0],m=l.rowYs[r],g=l.colXs[0],d=l.colXs[h],x=[];for(let C=0;C<r;C++)x.push({cells:Array.from({length:h},()=>({segments:[],text:""}))});const S=5;for(let C=0;C<e.length;C++){const I=e[C];if(I.x<g-S||I.x>d+S||I.y<m-S||I.y>p+S)continue;let w=-1;for(let y=0;y<r;y++){const v=l.rowYs[y],E=l.rowYs[y+1];if(I.y<=v+S&&I.y>=E-S){w=y;break}}let M=-1;for(let y=0;y<h;y++){const v=l.colXs[y],E=l.colXs[y+1];if(I.x>=v-S&&I.x<E+S){M=y;break}}if(w<0||M<0)continue;a.add(C);const T=x[w].cells[M];T.text?T.text+=" "+I.str:T.text=I.str,T.segments.push({text:I.str,bold:I.isBold,italic:I.isItalic})}x.some(C=>C.cells.some(I=>I.text.length>0))&&c.push({type:"table",rows:x,columnCount:h,alignment:"left",y:p})}return{tables:c,consumedIndices:a}}function L(t,o){if(typeof OffscreenCanvas<"u"){const e=new OffscreenCanvas(t,o),s=e.getContext("2d");return s?{canvas:e,ctx:s}:null}if(typeof document<"u"){const e=document.createElement("canvas");e.width=t,e.height=o;const s=e.getContext("2d");return s?{canvas:e,ctx:s}:null}return null}async function Y(t){return t instanceof OffscreenCanvas?await t.convertToBlob({type:"image/png"}):new Promise(o=>t.toBlob(o,"image/png"))}function B(t){(t instanceof OffscreenCanvas||t instanceof HTMLCanvasElement)&&(t.width=0,t.height=0)}async function z(t,o,e){if(o<1||e<1)return null;const s=L(o,e);if(!s)return null;const{canvas:n,ctx:a}=s;a.drawImage(t,0,0);const c=await Y(n);if(B(n),!c)return null;const u=await c.arrayBuffer();return{data:new Uint8Array(u),width:o,height:e}}async function A(t){if(!t)return null;if(typeof ImageBitmap<"u"&&t instanceof ImageBitmap)return z(t,t.width,t.height);if(t.bitmap instanceof ImageBitmap)return z(t.bitmap,t.bitmap.width,t.bitmap.height);if(typeof HTMLImageElement<"u"&&t instanceof HTMLImageElement){const l=t.naturalWidth||t.width||0,r=t.naturalHeight||t.height||0;return z(t,l,r)}if(typeof HTMLCanvasElement<"u"&&t instanceof HTMLCanvasElement)return z(t,t.width,t.height);if(t.imgData&&(t=t.imgData),!t?.data||!t.width||!t.height||t.width<1||t.height<1)return null;const o=L(t.width,t.height);if(!o)return null;const{canvas:e,ctx:s}=o,n=t.data instanceof Uint8ClampedArray?t.data:new Uint8ClampedArray(t.data),a=t.width*t.height;let c;if(n.length===a*4)c=n;else if(n.length===a*3){c=new Uint8ClampedArray(a*4);for(let l=0;l<a;l++)c[l*4]=n[l*3],c[l*4+1]=n[l*3+1],c[l*4+2]=n[l*3+2],c[l*4+3]=255}else if(n.length===a){c=new Uint8ClampedArray(a*4);for(let l=0;l<a;l++)c[l*4]=n[l],c[l*4+1]=n[l],c[l*4+2]=n[l],c[l*4+3]=255}else if(n.length===a*2){c=new Uint8ClampedArray(a*4);for(let l=0;l<a;l++)c[l*4]=n[l*2],c[l*4+1]=n[l*2],c[l*4+2]=n[l*2],c[l*4+3]=n[l*2+1]}else return B(e),null;const u=new ImageData(c,t.width,t.height);s.putImageData(u,0,0);const i=await Y(e);if(B(e),!i)return null;const f=await i.arrayBuffer();return{data:new Uint8Array(f),width:t.width,height:t.height}}function N(t,o){try{const e=t.objs.get(o);if(e)return Promise.resolve(e)}catch{}return new Promise(e=>{const s=setTimeout(()=>e(null),5e3);try{t.objs.get(o,n=>{clearTimeout(s),e(n)})}catch{clearTimeout(s),e(null)}})}async function dt(t){const o=t.getViewport({scale:.5}),e=L(o.width,o.height);if(!e)return;const{canvas:s,ctx:n}=e;try{await t.render({canvasContext:n,viewport:o}).promise}catch{}B(s)}async function pt(t,o){try{const e=await t.getOperatorList();for(let s=0;s<e.fnArray.length;s++){const n=e.fnArray[s];if(n===o.OPS.paintImageXObject||n===o.OPS.paintImageXObjectRepeat||n===o.OPS.paintJpegXObject||n===o.OPS.paintInlineImageXObject||n===o.OPS.paintInlineImageXObjectGroup)return!0}}catch{}return!1}async function mt(t,o){const e=[],s=new Set;try{if(!await pt(t,o))return e;await dt(t);const c=t.getViewport({scale:1}).height,u=await t.getOperatorList();let i=[1,0,0,1,0,0];const f=[],l=async r=>{if(!r)return;const h=c-i[5];e.push({...r,pdfY:h})};for(let r=0;r<u.fnArray.length;r++){const h=u.fnArray[r],p=u.argsArray[r];if(h===o.OPS.transform){const[m,g,d,x,S,b]=p;i=[i[0]*m+i[2]*g,i[1]*m+i[3]*g,i[0]*d+i[2]*x,i[1]*d+i[3]*x,i[0]*S+i[2]*b+i[4],i[1]*S+i[3]*b+i[5]]}h===o.OPS.save&&f.push([...i]),h===o.OPS.restore&&f.length>0&&(i=f.pop());try{if(h===o.OPS.paintImageXObject||h===o.OPS.paintImageXObjectRepeat){const m=String(p[0]);if(s.has(m))continue;s.add(m);const g=await N(t,m);await l(await A(g))}if(h===o.OPS.paintJpegXObject){const m=String(p[0]);if(s.has(m))continue;s.add(m);const g=await N(t,m);await l(await A(g))}if(h===o.OPS.paintInlineImageXObject){const m=p[0];m&&m.width&&m.height&&await l(await A(m))}if(h===o.OPS.paintInlineImageXObjectGroup){const m=Array.isArray(p[0])?p[0]:[p[0]];for(const g of m)g&&g.width&&g.height&&await l(await A(g))}}catch{}}}catch{}return e}async function xt(t){const e=t.getViewport({scale:2});let s,n;if(typeof OffscreenCanvas<"u"?(s=new OffscreenCanvas(e.width,e.height),n=s.getContext("2d")):typeof document<"u"&&(s=document.createElement("canvas"),s.width=e.width,s.height=e.height,n=s.getContext("2d")),!n)return null;try{await t.render({canvasContext:n,viewport:e}).promise}catch{return null}let a=null;return s instanceof OffscreenCanvas?a=await s.convertToBlob({type:"image/png"}):a=await new Promise(c=>s.toBlob(c,"image/png")),s.width=0,s.height=0,a}async function wt(t){const o=await xt(t);if(!o)return[];const{createWorker:e}=await import("./index-D6qMdeZC.js").then(function(n){return n.i}),s=await e("vie+eng",void 0,{});try{const{data:n}=await s.recognize(o);return!n.text||!n.text.trim()?[]:n.text.split(/\n\s*\n/).map(c=>c.replace(/\n/g," ").trim()).filter(Boolean).map((c,u)=>({type:"paragraph",segments:[{text:c,bold:!1,italic:!1}],text:c,fontSize:12,xStart:0,alignment:"left",y:-(u*100)}))}finally{await s.terminate()}}function O(t){switch(t.type){case"paragraph":case"heading":return t.text.length>0;case"list":return t.items.length>0;case"table":return t.rows.length>0}}async function yt(t,o){const{Document:e,Packer:s,Paragraph:n,TextRun:a,HeadingLevel:c,ImageRun:u,AlignmentType:i,Table:f,TableRow:l,TableCell:r,WidthType:h,LevelFormat:p,BorderStyle:m,convertInchesToTwip:g}=await import("./index-CUrDfrkn.js"),d={left:i.LEFT,center:i.CENTER,right:i.RIGHT},x=[],S=72,b=w=>{let T=w.width,y=w.height;if(T>600){const v=600/T;T=600,y=Math.round(y*v)}return new n({children:[new u({type:"png",data:w.data,transformation:{width:T,height:y}})],spacing:{before:120,after:120}})},C=w=>{switch(w.type){case"heading":return[new n({heading:w.headingLevel===1?c.HEADING_1:c.HEADING_2,children:w.segments.map(M=>new a({text:M.text,bold:!0,italics:M.italic,size:Math.round(w.fontSize*2)})),spacing:{before:240,after:120},alignment:d[w.alignment]})];case"paragraph":{const M=Math.max(0,w.xStart-S),T=M>5?Math.round(M*20):0;return[new n({children:w.segments.map(y=>new a({text:y.text,bold:y.bold,italics:y.italic,size:Math.round(w.fontSize*2)})),spacing:{after:120,line:Math.round(240*1.15)},alignment:d[w.alignment],indent:T>0?{left:T}:void 0})]}case"list":return w.items.map(M=>{const T=M.segments.map(y=>new a({text:y.text,bold:y.bold,italics:y.italic}));return w.listType==="bullet"?new n({children:T,bullet:{level:M.level},spacing:{after:60}}):new n({children:T,numbering:{reference:"decimal-numbering",level:M.level},spacing:{after:60}})});case"table":{const M={style:m.SINGLE,size:1,color:"999999"};return[new f({rows:w.rows.map(T=>new l({children:T.cells.map(y=>new r({children:[new n({children:y.segments.length>0?y.segments.map(v=>new a({text:v.text,bold:v.bold,italics:v.italic})):[]})],width:{size:Math.floor(100/w.columnCount),type:h.PERCENTAGE}}))})),width:{size:100,type:h.PERCENTAGE},borders:{top:M,bottom:M,left:M,right:M,insideHorizontal:M,insideVertical:M}})]}}};for(let w=0;w<t.length;w++){const{blocks:M,images:T}=t[w];if(!o||T.length===0)for(const y of M)O(y)&&x.push(...C(y));else{const y=[];for(const v of M)O(v)&&y.push({kind:"block",y:-v.y,block:v});for(const v of T)y.push({kind:"image",y:v.pdfY,image:v});y.sort((v,E)=>v.y-E.y);for(const v of y)v.kind==="image"?x.push(b(v.image)):x.push(...C(v.block))}w<t.length-1&&x.push(new n({pageBreakBefore:!0,children:[]}))}const I=new e({numbering:{config:[{reference:"decimal-numbering",levels:[{level:0,format:p.DECIMAL,text:"%1.",alignment:i.LEFT,start:1},{level:1,format:p.LOWER_LETTER,text:"%2.",alignment:i.LEFT,start:1}]}]},sections:[{children:x}]});return await s.toBlob(I)}function bt(t,o,e,s){const n=j(t,o),a=nt(n,s),c=n.filter((l,r)=>!a.consumed.has(r)),u=st(c,o,s),i=c.filter((l,r)=>!u.consumed.has(r));return[...q(i,e,s),...a.blocks,...u.blocks].sort((l,r)=>r.y-l.y)}async function St(t,o,e){e(2,"Đang tải thư viện...");const s=await U();e(5,"Đang đọc file PDF...");const n=await W(s,t),a=n.numPages,c=[],u=[];for(let r=1;r<=a;r++){const h=10+Math.round(r/a*30);e(h,`Đang trích xuất trang ${r}/${a}...`);const p=await n.getPage(r),m=p.getViewport({scale:1}),g=m.width,d=await p.getTextContent(),x=V(d),S=await p.getOperatorList(),{tables:b,consumedIndices:C}=gt(S,s,x,g,m.height),I=C.size>0?x.filter((M,T)=>!C.has(T)):x;let w=J(I,g);w=Q(w),c.push({lines:w,pageWidth:g,gridTables:b}),u.push(...w),await new Promise(M=>setTimeout(M,0))}const i=Z(u);u.length=0,e(45,"Đang phân tích cấu trúc...");const f=[];for(let r=0;r<a;r++){const h=45+Math.round(r/a*25);e(h,`Đang xử lý trang ${r+1}/${a}...`);const{lines:p,pageWidth:m,gridTables:g}=c[r],d=await n.getPage(r+1);let x;p.length===0&&g.length===0&&o.enableOCR?(e(h,`Đang OCR trang ${r+1}/${a}...`),x=await wt(d)):x=[...bt(p,m,o.preserveLayout,i),...g].sort((C,I)=>I.y-C.y);const S=o.includeImages?await mt(d,s):[];f.push({blocks:x,images:S}),c[r]={lines:[],pageWidth:0,gridTables:[]},await new Promise(b=>setTimeout(b,0))}e(75,"Đang tạo file DOCX...");const l=await yt(f,o.includeImages);return e(100,"Hoàn tất!"),l}self.onmessage=async t=>{const{buffer:o,options:e}=t.data;try{const n={type:"result",blob:await St(o,e,(a,c)=>{const u={type:"progress",pct:a,status:c};self.postMessage(u)})};self.postMessage(n)}catch(s){const n={type:"error",message:s?.message||"Conversion failed"};self.postMessage(n)}};
+(async ()=>{
+    async function U() {
+        const t = await import("./pdf-C_7zF4kU.js").then(async (m)=>{
+            await m.__tla;
+            return m;
+        });
+        return t.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${t.version}/build/pdf.worker.min.mjs`, t;
+    }
+    async function W(t, o) {
+        return await t.getDocument({
+            data: o
+        }).promise;
+    }
+    function $(t, o = []) {
+        const e = (t || "").toLowerCase(), s = e.replace(/[^a-z0-9]/g, " "), n = s.split(/\s+/).filter(Boolean), a = n.some((d)=>/^(bold|black|heavy|demi|semibold|ultrabold|extrabold|bd|sb)$/.test(d)), c = n.some((d)=>/^(italic|oblique|slant|slanted)$/.test(d)), u = /boldit|itbold|hb|blackit/.test(e), i = /\bit\b/.test(s) || /\bbi\b/.test(s) || /bolditalic|italicbold|obliqueitalic|italicoblique/.test(e), f = a || u, l = Math.abs(o[0] || 1), r = o[1] || 0, h = o[2] || 0, p = Math.abs(o[3] || 1), m = Math.abs(h) > .05 * l && l > .1 || Math.abs(r) > .05 * p && p > .1;
+        return {
+            bold: f,
+            italic: c || i || m
+        };
+    }
+    function V(t) {
+        const o = [];
+        for (const e of t.items){
+            if (!e.str || !e.str.trim() || !e.transform) continue;
+            const s = Math.abs(e.transform[0]) || Math.abs(e.transform[3]), n = e.fontName || "", a = $(n, e.transform);
+            o.push({
+                str: e.str.replace(/[\r\n]+/g, " "),
+                x: e.transform[4],
+                y: e.transform[5],
+                width: e.width || 0,
+                height: e.height || s,
+                fontSize: s,
+                fontName: n,
+                isBold: a.bold,
+                isItalic: a.italic
+            });
+        }
+        return o;
+    }
+    function F(t, o, e, s) {
+        const n = Math.max(1, o - t);
+        if (n > e * .65) return "left";
+        const a = Math.max(0, t), c = Math.max(0, e - o), u = Math.max(e * .025, Math.max(s * 1.8, 14));
+        if (c < u && a > e * .12 && n < e * .85) return "right";
+        const i = Math.abs(a - c), f = (t + o) / 2, l = e / 2;
+        return n < e * .55 && i <= u && a > e * .03 && c > e * .03 || n < e * .55 && Math.abs(f - l) <= s ? "center" : "left";
+    }
+    function R(t, o) {
+        const e = [];
+        for(let i = 0; i < t.length; i++){
+            if (i > 0 && t[i].segments.length > 0) {
+                const f = e[e.length - 1], l = t[i].segments[0];
+                if (f && f.bold === l.bold && f.italic === l.italic) {
+                    f.text += " " + l.text;
+                    for(let r = 1; r < t[i].segments.length; r++)e.push({
+                        ...t[i].segments[r]
+                    });
+                    continue;
+                }
+                f && (f.text += " ");
+            }
+            for (const f of t[i].segments)e.push({
+                ...f
+            });
+        }
+        const s = e.map((i)=>i.text).join("").trim(), n = t.reduce((i, f)=>i + f.fontSize, 0) / t.length, a = n > o * 1.2 && s.length < 200 && t.length <= 3;
+        let c = t[0].alignment;
+        if (t.length > 1) {
+            const i = t.map((d)=>d.xStart), f = t.map((d)=>d.xEnd), l = t.map((d)=>(d.xStart + d.xEnd) / 2), r = (d)=>Math.max(...d) - Math.min(...d), h = r(i), p = r(f), m = r(l), g = Math.min(h, m, p);
+            g === m ? c = "center" : g === p ? c = "right" : c = "left";
+        }
+        const u = t.reduce((i, f)=>i + f.xStart, 0) / t.length;
+        return a ? {
+            type: "heading",
+            segments: e,
+            text: s,
+            headingLevel: n > o * 1.5 ? 1 : 2,
+            fontSize: n,
+            xStart: u,
+            alignment: c,
+            y: t[0].y
+        } : {
+            type: "paragraph",
+            segments: e,
+            text: s,
+            fontSize: n,
+            xStart: u,
+            alignment: c,
+            y: t[0].y
+        };
+    }
+    function q(t, o, e) {
+        if (t.length === 0) return [];
+        if (o) {
+            const a = t.filter((i)=>i.text);
+            if (a.length === 0) return [];
+            const c = [];
+            let u = [
+                a[0]
+            ];
+            for(let i = 1; i < a.length; i++){
+                const f = u[u.length - 1], l = a[i], r = /^\p{Ll}/u.test(l.text), h = /[.:;?!]$/.test(f.text.trimEnd()), p = l.fontSize > e * 1.2, m = f.y - l.y, g = m > 0 && m <= f.fontSize * 3, d = l.xStart > f.xStart + f.fontSize * 2;
+                r && !h && !p && g && !d ? u.push(l) : (c.push(u), u = [
+                    l
+                ]);
+            }
+            return u.length > 0 && c.push(u), c.map((i)=>R(i, e));
+        }
+        const s = [];
+        let n = [
+            t[0]
+        ];
+        for(let a = 1; a < t.length; a++){
+            const c = t[a - 1], u = t[a], i = c.y - u.y, f = (c.fontSize + u.fontSize) / 2, l = u.xStart - c.xStart > c.fontSize, r = c.xStart - u.xStart > u.fontSize;
+            let h = i > f * 2 || Math.abs(u.fontSize - c.fontSize) > 1.5 || u.fontSize > e * 1.2 || l || r;
+            if (h) {
+                const p = /^\p{Ll}/u.test(u.text), m = /[.:;?!]$/.test(c.text.trimEnd()), g = i > 0 && i <= f * 3;
+                p && !m && g && (h = !1);
+            }
+            h ? (s.push(R(n, e)), n = [
+                u
+            ]) : n.push(u);
+        }
+        return n.length > 0 && s.push(R(n, e)), s;
+    }
+    function k(t) {
+        const o = [];
+        let e = null;
+        for(let n = 0; n < t.length; n++){
+            let a = "";
+            n > 0 && t[n].x - (t[n - 1].x + t[n - 1].width) > t[n].fontSize * .25 && (a = " ");
+            const c = t[n];
+            e && e.bold === c.isBold && e.italic === c.isItalic ? e.text += a + c.str : (e && a && (e.text += a), e = {
+                text: (e && a ? "" : a) + c.str,
+                bold: c.isBold,
+                italic: c.isItalic
+            }, o.push(e));
+        }
+        const s = o.map((n)=>n.text).join("").trim();
+        return {
+            xStart: t[0].x,
+            xEnd: t[t.length - 1].x + t[t.length - 1].width,
+            text: s,
+            segments: o
+        };
+    }
+    function D(t, o) {
+        t.sort((r, h)=>r.x - h.x);
+        const e = [];
+        let s = null;
+        const n = [];
+        let a = [
+            t[0]
+        ];
+        for(let r = 1; r < t.length; r++)t[r].x - (t[r - 1].x + t[r - 1].width) > t[r].fontSize * 2 ? (n.push(k(a)), a = [
+            t[r]
+        ]) : a.push(t[r]);
+        a.length > 0 && n.push(k(a));
+        for(let r = 0; r < t.length; r++){
+            let h = "";
+            r > 0 && t[r].x - (t[r - 1].x + t[r - 1].width) > t[r].fontSize * .25 && (h = " ");
+            const p = t[r];
+            s && s.bold === p.isBold && s.italic === p.isItalic ? s.text += h + p.str : (s && h && (s.text += h), s = {
+                text: (s && h ? "" : h) + p.str,
+                bold: p.isBold,
+                italic: p.isItalic
+            }, e.push(s));
+        }
+        const c = e.map((r)=>r.text).join("").trim(), u = t.reduce((r, h)=>r + h.fontSize, 0) / t.length, i = t[0].x, f = t[t.length - 1], l = f.x + f.width;
+        return {
+            segments: e,
+            segmentGroups: n,
+            text: c,
+            y: t[0].y,
+            fontSize: u,
+            xStart: i,
+            xEnd: l,
+            alignment: F(i, l, o, u)
+        };
+    }
+    function J(t, o) {
+        if (t.length === 0) return [];
+        t.sort((n, a)=>a.y - n.y || n.x - a.x);
+        const e = [];
+        let s = [
+            t[0]
+        ];
+        for(let n = 1; n < t.length; n++){
+            const a = t[n], c = s[0].y, u = Math.max(a.fontSize, s[0].fontSize) * .5;
+            Math.abs(a.y - c) > u ? (e.push(D(s, o)), s = [
+                a
+            ]) : s.push(a);
+        }
+        return s.length > 0 && e.push(D(s, o)), e;
+    }
+    function Q(t) {
+        for(let o = 0; o < t.length - 1; o++){
+            const e = t[o], s = t[o + 1];
+            if (e.text.endsWith("-") && /^\p{L}/u.test(s.text)) {
+                e.text = e.text.slice(0, -1);
+                const n = e.segments[e.segments.length - 1];
+                n && n.text.endsWith("-") && (n.text = n.text.slice(0, -1)), s.noLeadingSpace = !0;
+            }
+        }
+        return t;
+    }
+    function Z(t) {
+        const o = t.map((s)=>s.fontSize).sort((s, n)=>s - n);
+        if (o.length === 0) return 12;
+        const e = Math.floor(o.length / 2);
+        return o.length % 2 === 0 ? (o[e - 1] + o[e]) / 2 : o[e];
+    }
+    function K(t, o) {
+        const e = t.filter((i)=>i.xEnd - i.xStart < o * .55);
+        if (e.length < 4) return [];
+        const s = e.map((i)=>i.xStart).sort((i, f)=>i - f), n = o * .15, a = [];
+        let c = [
+            s[0]
+        ];
+        for(let i = 1; i < s.length; i++)s[i] - s[i - 1] > n ? (a.push(c), c = [
+            s[i]
+        ]) : c.push(s[i]);
+        a.push(c);
+        const u = a.filter((i)=>i.length >= 2);
+        return u.length <= 1 ? [] : u.map((i)=>i.reduce((f, l)=>f + l, 0) / i.length).sort((i, f)=>i - f);
+    }
+    function j(t, o) {
+        if (t.length <= 2) return t;
+        const e = K(t, o);
+        if (e.length <= 1) return t;
+        const s = t.length, n = Math.max(...t.map((r)=>r.y)), a = t.map((r)=>{
+            if (r.xEnd - r.xStart >= o * .55) return -1;
+            let h = 0, p = 1 / 0;
+            for(let m = 0; m < e.length; m++){
+                const g = Math.abs(r.xStart - e[m]);
+                g < p && (p = g, h = m);
+            }
+            return h;
+        }), c = (r, h)=>{
+            const p = t[r], m = t[h], g = a[r], d = a[h], x = (p.fontSize + m.fontSize) / 2, S = p.y - m.y;
+            let b = 0;
+            return b -= Math.abs(p.fontSize - m.fontSize) * 2, g === d ? (b += 100, S > 0 ? (b += 50, b -= S / (x * 2)) : b -= 200, Math.abs(p.xStart - m.xStart) < x && (b += 5)) : g >= 0 && d >= 0 && d === g + 1 ? (b += 40, b += m.y / (n || 1) * 30) : g >= 0 && d >= 0 && d > g ? (b -= 20, b += m.y / (n || 1) * 10) : d === -1 || g === -1 ? (b += 20, S > 0 ? b += 20 : b -= 50) : b -= 150, b;
+        }, u = new Array(s).fill(!1), i = [];
+        let f = 0;
+        for(let r = 1; r < s; r++){
+            const h = a[r] < 0 ? 0 : a[r], p = a[f] < 0 ? 0 : a[f];
+            (h < p || h === p && t[r].y > t[f].y) && (f = r);
+        }
+        let l = f;
+        for(; i.length < s;){
+            u[l] = !0, i.push(t[l]);
+            let r = -1, h = -1 / 0;
+            for(let p = 0; p < s; p++){
+                if (u[p]) continue;
+                const m = c(l, p);
+                m > h && (h = m, r = p);
+            }
+            if (r === -1) break;
+            l = r;
+        }
+        for(let r = 0; r < s; r++)u[r] || i.push(t[r]);
+        return i;
+    }
+    const G = /^[•◦\-–*]\s+/, X = /^(\d+[.)]\s+|[a-zA-Z][.)]\s+)/;
+    function tt(t, o) {
+        const e = [];
+        let s = o;
+        for (const n of t){
+            if (s >= n.text.length) {
+                s -= n.text.length;
+                continue;
+            }
+            s > 0 ? (e.push({
+                ...n,
+                text: n.text.slice(s)
+            }), s = 0) : e.push({
+                ...n
+            });
+        }
+        return e;
+    }
+    function et(t, o) {
+        if (o.length === 0) return;
+        const e = t[t.length - 1], s = o[0];
+        if (e && e.bold === s.bold && e.italic === s.italic) {
+            e.text += " " + s.text;
+            for(let n = 1; n < o.length; n++)t.push({
+                ...o[n]
+            });
+        } else {
+            e && (e.text += " ");
+            for (const n of o)t.push({
+                ...n
+            });
+        }
+    }
+    function nt(t, o) {
+        const e = new Set, s = [];
+        let n = 0;
+        for(; n < t.length;){
+            const a = t[n];
+            if (a.fontSize > o * 1.2) {
+                n++;
+                continue;
+            }
+            const c = G.exec(a.text), u = X.exec(a.text);
+            if (!c && !u) {
+                n++;
+                continue;
+            }
+            const i = c ? "bullet" : "numbered", f = c ? G : X, l = a.xStart, r = [];
+            for(; n < t.length;){
+                const h = t[n], p = f.exec(h.text);
+                if (p && Math.abs(h.xStart - l) < h.fontSize * 3) {
+                    const m = tt(h.segments, p[0].length), g = h.text.slice(p[0].length), d = Math.max(0, Math.round((h.xStart - l) / (h.fontSize * 2)));
+                    r.push({
+                        segments: m,
+                        text: g,
+                        level: d
+                    }), e.add(n), n++;
+                } else if (r.length > 0 && h.xStart > l + h.fontSize && h.fontSize <= o * 1.2) {
+                    const m = r[r.length - 1];
+                    m.text += " " + h.text, et(m.segments, h.segments), e.add(n), n++;
+                } else break;
+            }
+            r.length >= 1 ? s.push({
+                type: "list",
+                listType: i,
+                items: r,
+                alignment: a.alignment,
+                y: a.y
+            }) : e.clear();
+        }
+        return {
+            consumed: e,
+            blocks: s
+        };
+    }
+    function st(t, o, e) {
+        const s = new Set, n = [];
+        let a = 0;
+        for(; a < t.length;){
+            if (t[a].segmentGroups.length < 3) {
+                a++;
+                continue;
+            }
+            const c = a;
+            for(; a < t.length && t[a].segmentGroups.length >= 3 && t[a].fontSize <= e * 1.2;)a++;
+            const u = a;
+            if (u - c < 3) continue;
+            const i = t.slice(c, u), f = [];
+            for (const g of i)for (const d of g.segmentGroups)f.push((d.xStart + d.xEnd) / 2);
+            f.sort((g, d)=>g - d);
+            const l = e * 2, r = [];
+            let h = [
+                f[0]
+            ];
+            for(let g = 1; g < f.length; g++)if (f[g] - f[g - 1] <= l) h.push(f[g]);
+            else {
+                const d = h.reduce((x, S)=>x + S, 0) / h.length;
+                r.push({
+                    x: d,
+                    tolerance: l
+                }), h = [
+                    f[g]
+                ];
+            }
+            if (h.length > 0) {
+                const g = h.reduce((d, x)=>d + x, 0) / h.length;
+                r.push({
+                    x: g,
+                    tolerance: l
+                });
+            }
+            if (r.length < 3) continue;
+            if (r.length >= 3) {
+                const g = [];
+                for(let S = 1; S < r.length; S++)g.push(r[S].x - r[S - 1].x);
+                const d = Math.min(...g), x = Math.max(...g);
+                if (d > 0 && x / d > 3) continue;
+            }
+            let p = 0;
+            for (const g of i){
+                let d = 0;
+                for (const x of g.segmentGroups){
+                    const S = (x.xStart + x.xEnd) / 2;
+                    r.some((b)=>Math.abs(S - b.x) <= b.tolerance) && d++;
+                }
+                d >= 3 && p++;
+            }
+            if (p < i.length * .7) continue;
+            const m = [];
+            for (const g of i){
+                const d = r.map(()=>({
+                        segments: [],
+                        text: ""
+                    }));
+                for (const x of g.segmentGroups){
+                    const S = (x.xStart + x.xEnd) / 2;
+                    let b = 0, C = 1 / 0;
+                    for(let I = 0; I < r.length; I++){
+                        const w = Math.abs(S - r[I].x);
+                        w < C && (C = w, b = I);
+                    }
+                    d[b] = {
+                        segments: x.segments.map((I)=>({
+                                ...I
+                            })),
+                        text: x.text
+                    };
+                }
+                m.push({
+                    cells: d
+                });
+            }
+            for(let g = c; g < u; g++)s.add(g);
+            n.push({
+                type: "table",
+                rows: m,
+                columnCount: r.length,
+                alignment: "left",
+                y: i[0].y
+            });
+        }
+        return {
+            consumed: s,
+            blocks: n
+        };
+    }
+    function P(t, o, e) {
+        return [
+            t[0] * o + t[2] * e + t[4],
+            t[1] * o + t[3] * e + t[5]
+        ];
+    }
+    function ot(t, o, e, s, n, a, c) {
+        return [
+            t[0] * o + t[2] * e,
+            t[1] * o + t[3] * e,
+            t[0] * s + t[2] * n,
+            t[1] * s + t[3] * n,
+            t[0] * a + t[2] * c + t[4],
+            t[1] * a + t[3] * c + t[5]
+        ];
+    }
+    function H(t, o, e, s, n, a, c) {
+        Math.sqrt((e - t) ** 2 + (s - o) ** 2) < 3 || (Math.abs(o - s) <= n ? a.push({
+            x1: Math.min(t, e),
+            y1: (o + s) / 2,
+            x2: Math.max(t, e),
+            y2: (o + s) / 2
+        }) : Math.abs(t - e) <= n && c.push({
+            x1: (t + e) / 2,
+            y1: Math.min(o, s),
+            x2: (t + e) / 2,
+            y2: Math.max(o, s)
+        }));
+    }
+    const at = 0, rt = 1, it = 2, ct = 3, lt = 4;
+    function ft(t, o, e, s, n) {
+        let a = 0, c = 0, u = 0, i = 0, f = 0;
+        for(; f < t.length;){
+            const l = t[f++] | 0;
+            if (l === at) a = t[f++], c = t[f++], u = a, i = c;
+            else if (l === rt) {
+                const r = t[f++], h = t[f++], [p, m] = P(o, a, c), [g, d] = P(o, r, h);
+                H(p, m, g, d, e, s, n), a = r, c = h;
+            } else if (l === it) a = t[f + 4], c = t[f + 5], f += 6;
+            else if (l === ct) a = t[f + 2], c = t[f + 3], f += 4;
+            else if (l === lt) {
+                if (a !== u || c !== i) {
+                    const [r, h] = P(o, a, c), [p, m] = P(o, u, i);
+                    H(r, h, p, m, e, s, n);
+                }
+                a = u, c = i;
+            } else break;
+        }
+    }
+    function ht(t, o) {
+        const e = [], s = [];
+        let a = [
+            1,
+            0,
+            0,
+            1,
+            0,
+            0
+        ];
+        const c = [];
+        for(let u = 0; u < t.fnArray.length; u++){
+            const i = t.fnArray[u], f = t.argsArray[u];
+            if (i === o.OPS.transform) {
+                a = ot(a, f[0], f[1], f[2], f[3], f[4], f[5]);
+                continue;
+            }
+            if (i === o.OPS.save) {
+                c.push([
+                    ...a
+                ]);
+                continue;
+            }
+            if (i === o.OPS.restore && c.length > 0) {
+                a = c.pop();
+                continue;
+            }
+            if (i === o.OPS.constructPath) {
+                const l = f[1], r = Array.isArray(l) ? l[0] : l;
+                r && typeof r.length == "number" && r.length > 0 && ft(r, a, 1.5, e, s);
+            }
+        }
+        return {
+            horizontal: e,
+            vertical: s
+        };
+    }
+    function _(t, o) {
+        if (t.length === 0) return [];
+        t.sort((s, n)=>s - n);
+        const e = [
+            [
+                t[0]
+            ]
+        ];
+        for(let s = 1; s < t.length; s++){
+            const n = e[e.length - 1];
+            t[s] - n[n.length - 1] <= o ? n.push(t[s]) : e.push([
+                t[s]
+            ]);
+        }
+        return e.map((s)=>s.reduce((n, a)=>n + a, 0) / s.length);
+    }
+    function ut(t, o, e, s) {
+        const c = t.filter((d)=>d.y1 > 2 && d.y1 < s - 2), u = o.filter((d)=>d.x1 > 2 && d.x1 < e - 2), i = _(c.map((d)=>d.y1), 3), f = _(u.map((d)=>d.x1), 3);
+        if (i.length < 3 || f.length < 3) return [];
+        const l = f[0], r = f[f.length - 1], h = i[0], p = i[i.length - 1], m = r - l, g = p - h;
+        return m < 30 || g < 30 ? [] : c.length < i.length * 2 ? [] : u.length < f.length * 2 ? [] : [
+            {
+                rowYs: [
+                    ...i
+                ].sort((d, x)=>x - d),
+                colXs: f
+            }
+        ];
+    }
+    function gt(t, o, e, s, n) {
+        const a = new Set, c = [], { horizontal: u, vertical: i } = ht(t, o), f = ut(u, i, s, n);
+        if (f.length === 0) return {
+            tables: c,
+            consumedIndices: a
+        };
+        for (const l of f){
+            const r = l.rowYs.length - 1, h = l.colXs.length - 1;
+            if (r < 1 || h < 1) continue;
+            const p = l.rowYs[0], m = l.rowYs[r], g = l.colXs[0], d = l.colXs[h], x = [];
+            for(let C = 0; C < r; C++)x.push({
+                cells: Array.from({
+                    length: h
+                }, ()=>({
+                        segments: [],
+                        text: ""
+                    }))
+            });
+            const S = 5;
+            for(let C = 0; C < e.length; C++){
+                const I = e[C];
+                if (I.x < g - S || I.x > d + S || I.y < m - S || I.y > p + S) continue;
+                let w = -1;
+                for(let y = 0; y < r; y++){
+                    const v = l.rowYs[y], E = l.rowYs[y + 1];
+                    if (I.y <= v + S && I.y >= E - S) {
+                        w = y;
+                        break;
+                    }
+                }
+                let M = -1;
+                for(let y = 0; y < h; y++){
+                    const v = l.colXs[y], E = l.colXs[y + 1];
+                    if (I.x >= v - S && I.x < E + S) {
+                        M = y;
+                        break;
+                    }
+                }
+                if (w < 0 || M < 0) continue;
+                a.add(C);
+                const T = x[w].cells[M];
+                T.text ? T.text += " " + I.str : T.text = I.str, T.segments.push({
+                    text: I.str,
+                    bold: I.isBold,
+                    italic: I.isItalic
+                });
+            }
+            x.some((C)=>C.cells.some((I)=>I.text.length > 0)) && c.push({
+                type: "table",
+                rows: x,
+                columnCount: h,
+                alignment: "left",
+                y: p
+            });
+        }
+        return {
+            tables: c,
+            consumedIndices: a
+        };
+    }
+    function L(t, o) {
+        if (typeof OffscreenCanvas < "u") {
+            const e = new OffscreenCanvas(t, o), s = e.getContext("2d");
+            return s ? {
+                canvas: e,
+                ctx: s
+            } : null;
+        }
+        if (typeof document < "u") {
+            const e = document.createElement("canvas");
+            e.width = t, e.height = o;
+            const s = e.getContext("2d");
+            return s ? {
+                canvas: e,
+                ctx: s
+            } : null;
+        }
+        return null;
+    }
+    async function Y(t) {
+        return t instanceof OffscreenCanvas ? await t.convertToBlob({
+            type: "image/png"
+        }) : new Promise((o)=>t.toBlob(o, "image/png"));
+    }
+    function B(t) {
+        (t instanceof OffscreenCanvas || t instanceof HTMLCanvasElement) && (t.width = 0, t.height = 0);
+    }
+    async function z(t, o, e) {
+        if (o < 1 || e < 1) return null;
+        const s = L(o, e);
+        if (!s) return null;
+        const { canvas: n, ctx: a } = s;
+        a.drawImage(t, 0, 0);
+        const c = await Y(n);
+        if (B(n), !c) return null;
+        const u = await c.arrayBuffer();
+        return {
+            data: new Uint8Array(u),
+            width: o,
+            height: e
+        };
+    }
+    async function A(t) {
+        if (!t) return null;
+        if (typeof ImageBitmap < "u" && t instanceof ImageBitmap) return z(t, t.width, t.height);
+        if (t.bitmap instanceof ImageBitmap) return z(t.bitmap, t.bitmap.width, t.bitmap.height);
+        if (typeof HTMLImageElement < "u" && t instanceof HTMLImageElement) {
+            const l = t.naturalWidth || t.width || 0, r = t.naturalHeight || t.height || 0;
+            return z(t, l, r);
+        }
+        if (typeof HTMLCanvasElement < "u" && t instanceof HTMLCanvasElement) return z(t, t.width, t.height);
+        if (t.imgData && (t = t.imgData), !t?.data || !t.width || !t.height || t.width < 1 || t.height < 1) return null;
+        const o = L(t.width, t.height);
+        if (!o) return null;
+        const { canvas: e, ctx: s } = o, n = t.data instanceof Uint8ClampedArray ? t.data : new Uint8ClampedArray(t.data), a = t.width * t.height;
+        let c;
+        if (n.length === a * 4) c = n;
+        else if (n.length === a * 3) {
+            c = new Uint8ClampedArray(a * 4);
+            for(let l = 0; l < a; l++)c[l * 4] = n[l * 3], c[l * 4 + 1] = n[l * 3 + 1], c[l * 4 + 2] = n[l * 3 + 2], c[l * 4 + 3] = 255;
+        } else if (n.length === a) {
+            c = new Uint8ClampedArray(a * 4);
+            for(let l = 0; l < a; l++)c[l * 4] = n[l], c[l * 4 + 1] = n[l], c[l * 4 + 2] = n[l], c[l * 4 + 3] = 255;
+        } else if (n.length === a * 2) {
+            c = new Uint8ClampedArray(a * 4);
+            for(let l = 0; l < a; l++)c[l * 4] = n[l * 2], c[l * 4 + 1] = n[l * 2], c[l * 4 + 2] = n[l * 2], c[l * 4 + 3] = n[l * 2 + 1];
+        } else return B(e), null;
+        const u = new ImageData(c, t.width, t.height);
+        s.putImageData(u, 0, 0);
+        const i = await Y(e);
+        if (B(e), !i) return null;
+        const f = await i.arrayBuffer();
+        return {
+            data: new Uint8Array(f),
+            width: t.width,
+            height: t.height
+        };
+    }
+    function N(t, o) {
+        try {
+            const e = t.objs.get(o);
+            if (e) return Promise.resolve(e);
+        } catch  {}
+        return new Promise((e)=>{
+            const s = setTimeout(()=>e(null), 5e3);
+            try {
+                t.objs.get(o, (n)=>{
+                    clearTimeout(s), e(n);
+                });
+            } catch  {
+                clearTimeout(s), e(null);
+            }
+        });
+    }
+    async function dt(t) {
+        const o = t.getViewport({
+            scale: .5
+        }), e = L(o.width, o.height);
+        if (!e) return;
+        const { canvas: s, ctx: n } = e;
+        try {
+            await t.render({
+                canvasContext: n,
+                viewport: o
+            }).promise;
+        } catch  {}
+        B(s);
+    }
+    async function pt(t, o) {
+        try {
+            const e = await t.getOperatorList();
+            for(let s = 0; s < e.fnArray.length; s++){
+                const n = e.fnArray[s];
+                if (n === o.OPS.paintImageXObject || n === o.OPS.paintImageXObjectRepeat || n === o.OPS.paintJpegXObject || n === o.OPS.paintInlineImageXObject || n === o.OPS.paintInlineImageXObjectGroup) return !0;
+            }
+        } catch  {}
+        return !1;
+    }
+    async function mt(t, o) {
+        const e = [], s = new Set;
+        try {
+            if (!await pt(t, o)) return e;
+            await dt(t);
+            const c = t.getViewport({
+                scale: 1
+            }).height, u = await t.getOperatorList();
+            let i = [
+                1,
+                0,
+                0,
+                1,
+                0,
+                0
+            ];
+            const f = [], l = async (r)=>{
+                if (!r) return;
+                const h = c - i[5];
+                e.push({
+                    ...r,
+                    pdfY: h
+                });
+            };
+            for(let r = 0; r < u.fnArray.length; r++){
+                const h = u.fnArray[r], p = u.argsArray[r];
+                if (h === o.OPS.transform) {
+                    const [m, g, d, x, S, b] = p;
+                    i = [
+                        i[0] * m + i[2] * g,
+                        i[1] * m + i[3] * g,
+                        i[0] * d + i[2] * x,
+                        i[1] * d + i[3] * x,
+                        i[0] * S + i[2] * b + i[4],
+                        i[1] * S + i[3] * b + i[5]
+                    ];
+                }
+                h === o.OPS.save && f.push([
+                    ...i
+                ]), h === o.OPS.restore && f.length > 0 && (i = f.pop());
+                try {
+                    if (h === o.OPS.paintImageXObject || h === o.OPS.paintImageXObjectRepeat) {
+                        const m = String(p[0]);
+                        if (s.has(m)) continue;
+                        s.add(m);
+                        const g = await N(t, m);
+                        await l(await A(g));
+                    }
+                    if (h === o.OPS.paintJpegXObject) {
+                        const m = String(p[0]);
+                        if (s.has(m)) continue;
+                        s.add(m);
+                        const g = await N(t, m);
+                        await l(await A(g));
+                    }
+                    if (h === o.OPS.paintInlineImageXObject) {
+                        const m = p[0];
+                        m && m.width && m.height && await l(await A(m));
+                    }
+                    if (h === o.OPS.paintInlineImageXObjectGroup) {
+                        const m = Array.isArray(p[0]) ? p[0] : [
+                            p[0]
+                        ];
+                        for (const g of m)g && g.width && g.height && await l(await A(g));
+                    }
+                } catch  {}
+            }
+        } catch  {}
+        return e;
+    }
+    async function xt(t) {
+        const e = t.getViewport({
+            scale: 2
+        });
+        let s, n;
+        if (typeof OffscreenCanvas < "u" ? (s = new OffscreenCanvas(e.width, e.height), n = s.getContext("2d")) : typeof document < "u" && (s = document.createElement("canvas"), s.width = e.width, s.height = e.height, n = s.getContext("2d")), !n) return null;
+        try {
+            await t.render({
+                canvasContext: n,
+                viewport: e
+            }).promise;
+        } catch  {
+            return null;
+        }
+        let a = null;
+        return s instanceof OffscreenCanvas ? a = await s.convertToBlob({
+            type: "image/png"
+        }) : a = await new Promise((c)=>s.toBlob(c, "image/png")), s.width = 0, s.height = 0, a;
+    }
+    async function wt(t) {
+        const o = await xt(t);
+        if (!o) return [];
+        const { createWorker: e } = await import("./index-D6qMdeZC.js").then(function(n) {
+            return n.i;
+        }), s = await e("vie+eng", void 0, {});
+        try {
+            const { data: n } = await s.recognize(o);
+            return !n.text || !n.text.trim() ? [] : n.text.split(/\n\s*\n/).map((c)=>c.replace(/\n/g, " ").trim()).filter(Boolean).map((c, u)=>({
+                    type: "paragraph",
+                    segments: [
+                        {
+                            text: c,
+                            bold: !1,
+                            italic: !1
+                        }
+                    ],
+                    text: c,
+                    fontSize: 12,
+                    xStart: 0,
+                    alignment: "left",
+                    y: -(u * 100)
+                }));
+        } finally{
+            await s.terminate();
+        }
+    }
+    function O(t) {
+        switch(t.type){
+            case "paragraph":
+            case "heading":
+                return t.text.length > 0;
+            case "list":
+                return t.items.length > 0;
+            case "table":
+                return t.rows.length > 0;
+        }
+    }
+    async function yt(t, o) {
+        const { Document: e, Packer: s, Paragraph: n, TextRun: a, HeadingLevel: c, ImageRun: u, AlignmentType: i, Table: f, TableRow: l, TableCell: r, WidthType: h, LevelFormat: p, BorderStyle: m, convertInchesToTwip: g } = await import("./index-CUrDfrkn.js"), d = {
+            left: i.LEFT,
+            center: i.CENTER,
+            right: i.RIGHT
+        }, x = [], S = 72, b = (w)=>{
+            let T = w.width, y = w.height;
+            if (T > 600) {
+                const v = 600 / T;
+                T = 600, y = Math.round(y * v);
+            }
+            return new n({
+                children: [
+                    new u({
+                        type: "png",
+                        data: w.data,
+                        transformation: {
+                            width: T,
+                            height: y
+                        }
+                    })
+                ],
+                spacing: {
+                    before: 120,
+                    after: 120
+                }
+            });
+        }, C = (w)=>{
+            switch(w.type){
+                case "heading":
+                    return [
+                        new n({
+                            heading: w.headingLevel === 1 ? c.HEADING_1 : c.HEADING_2,
+                            children: w.segments.map((M)=>new a({
+                                    text: M.text,
+                                    bold: !0,
+                                    italics: M.italic,
+                                    size: Math.round(w.fontSize * 2)
+                                })),
+                            spacing: {
+                                before: 240,
+                                after: 120
+                            },
+                            alignment: d[w.alignment]
+                        })
+                    ];
+                case "paragraph":
+                    {
+                        const M = Math.max(0, w.xStart - S), T = M > 5 ? Math.round(M * 20) : 0;
+                        return [
+                            new n({
+                                children: w.segments.map((y)=>new a({
+                                        text: y.text,
+                                        bold: y.bold,
+                                        italics: y.italic,
+                                        size: Math.round(w.fontSize * 2)
+                                    })),
+                                spacing: {
+                                    after: 120,
+                                    line: Math.round(240 * 1.15)
+                                },
+                                alignment: d[w.alignment],
+                                indent: T > 0 ? {
+                                    left: T
+                                } : void 0
+                            })
+                        ];
+                    }
+                case "list":
+                    return w.items.map((M)=>{
+                        const T = M.segments.map((y)=>new a({
+                                text: y.text,
+                                bold: y.bold,
+                                italics: y.italic
+                            }));
+                        return w.listType === "bullet" ? new n({
+                            children: T,
+                            bullet: {
+                                level: M.level
+                            },
+                            spacing: {
+                                after: 60
+                            }
+                        }) : new n({
+                            children: T,
+                            numbering: {
+                                reference: "decimal-numbering",
+                                level: M.level
+                            },
+                            spacing: {
+                                after: 60
+                            }
+                        });
+                    });
+                case "table":
+                    {
+                        const M = {
+                            style: m.SINGLE,
+                            size: 1,
+                            color: "999999"
+                        };
+                        return [
+                            new f({
+                                rows: w.rows.map((T)=>new l({
+                                        children: T.cells.map((y)=>new r({
+                                                children: [
+                                                    new n({
+                                                        children: y.segments.length > 0 ? y.segments.map((v)=>new a({
+                                                                text: v.text,
+                                                                bold: v.bold,
+                                                                italics: v.italic
+                                                            })) : []
+                                                    })
+                                                ],
+                                                width: {
+                                                    size: Math.floor(100 / w.columnCount),
+                                                    type: h.PERCENTAGE
+                                                }
+                                            }))
+                                    })),
+                                width: {
+                                    size: 100,
+                                    type: h.PERCENTAGE
+                                },
+                                borders: {
+                                    top: M,
+                                    bottom: M,
+                                    left: M,
+                                    right: M,
+                                    insideHorizontal: M,
+                                    insideVertical: M
+                                }
+                            })
+                        ];
+                    }
+            }
+        };
+        for(let w = 0; w < t.length; w++){
+            const { blocks: M, images: T } = t[w];
+            if (!o || T.length === 0) for (const y of M)O(y) && x.push(...C(y));
+            else {
+                const y = [];
+                for (const v of M)O(v) && y.push({
+                    kind: "block",
+                    y: -v.y,
+                    block: v
+                });
+                for (const v of T)y.push({
+                    kind: "image",
+                    y: v.pdfY,
+                    image: v
+                });
+                y.sort((v, E)=>v.y - E.y);
+                for (const v of y)v.kind === "image" ? x.push(b(v.image)) : x.push(...C(v.block));
+            }
+            w < t.length - 1 && x.push(new n({
+                pageBreakBefore: !0,
+                children: []
+            }));
+        }
+        const I = new e({
+            numbering: {
+                config: [
+                    {
+                        reference: "decimal-numbering",
+                        levels: [
+                            {
+                                level: 0,
+                                format: p.DECIMAL,
+                                text: "%1.",
+                                alignment: i.LEFT,
+                                start: 1
+                            },
+                            {
+                                level: 1,
+                                format: p.LOWER_LETTER,
+                                text: "%2.",
+                                alignment: i.LEFT,
+                                start: 1
+                            }
+                        ]
+                    }
+                ]
+            },
+            sections: [
+                {
+                    children: x
+                }
+            ]
+        });
+        return await s.toBlob(I);
+    }
+    function bt(t, o, e, s) {
+        const n = j(t, o), a = nt(n, s), c = n.filter((l, r)=>!a.consumed.has(r)), u = st(c, o, s), i = c.filter((l, r)=>!u.consumed.has(r));
+        return [
+            ...q(i, e, s),
+            ...a.blocks,
+            ...u.blocks
+        ].sort((l, r)=>r.y - l.y);
+    }
+    async function St(t, o, e) {
+        e(2, "Đang tải thư viện...");
+        const s = await U();
+        e(5, "Đang đọc file PDF...");
+        const n = await W(s, t), a = n.numPages, c = [], u = [];
+        for(let r = 1; r <= a; r++){
+            const h = 10 + Math.round(r / a * 30);
+            e(h, `Đang trích xuất trang ${r}/${a}...`);
+            const p = await n.getPage(r), m = p.getViewport({
+                scale: 1
+            }), g = m.width, d = await p.getTextContent(), x = V(d), S = await p.getOperatorList(), { tables: b, consumedIndices: C } = gt(S, s, x, g, m.height), I = C.size > 0 ? x.filter((M, T)=>!C.has(T)) : x;
+            let w = J(I, g);
+            w = Q(w), c.push({
+                lines: w,
+                pageWidth: g,
+                gridTables: b
+            }), u.push(...w), await new Promise((M)=>setTimeout(M, 0));
+        }
+        const i = Z(u);
+        u.length = 0, e(45, "Đang phân tích cấu trúc...");
+        const f = [];
+        for(let r = 0; r < a; r++){
+            const h = 45 + Math.round(r / a * 25);
+            e(h, `Đang xử lý trang ${r + 1}/${a}...`);
+            const { lines: p, pageWidth: m, gridTables: g } = c[r], d = await n.getPage(r + 1);
+            let x;
+            p.length === 0 && g.length === 0 && o.enableOCR ? (e(h, `Đang OCR trang ${r + 1}/${a}...`), x = await wt(d)) : x = [
+                ...bt(p, m, o.preserveLayout, i),
+                ...g
+            ].sort((C, I)=>I.y - C.y);
+            const S = o.includeImages ? await mt(d, s) : [];
+            f.push({
+                blocks: x,
+                images: S
+            }), c[r] = {
+                lines: [],
+                pageWidth: 0,
+                gridTables: []
+            }, await new Promise((b)=>setTimeout(b, 0));
+        }
+        e(75, "Đang tạo file DOCX...");
+        const l = await yt(f, o.includeImages);
+        return e(100, "Hoàn tất!"), l;
+    }
+    self.onmessage = async (t)=>{
+        const { buffer: o, options: e } = t.data;
+        try {
+            const n = {
+                type: "result",
+                blob: await St(o, e, (a, c)=>{
+                    const u = {
+                        type: "progress",
+                        pct: a,
+                        status: c
+                    };
+                    self.postMessage(u);
+                })
+            };
+            self.postMessage(n);
+        } catch (s) {
+            const n = {
+                type: "error",
+                message: s?.message || "Conversion failed"
+            };
+            self.postMessage(n);
+        }
+    };
+})();

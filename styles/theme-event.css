@@ -551,7 +551,8 @@ h3 {
     50% { background-position: 100% 50%; }
 }
 .card--tool,
-.card--fun {
+.card--fun,
+.card--learn {
     padding: 24px 16px;
     align-items: center;
     text-align: center;

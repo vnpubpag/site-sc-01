@@ -1,5 +1,5 @@
 /* =============================================
-   THEME: Modern (Dark)
+   THEME: Dark
    chitiet.vn – Minimal Design Rules v1.0
    =============================================
    Same token names, dark values.
@@ -252,9 +252,15 @@ h3 {
     animation: heroGlow 4s linear infinite;
 }
 @keyframes heroGlow {
-    0%   { background-position: 80% 0; }  /* highlight just off-screen left  */
-    50%  { background-position: 10% 0; }  /* highlight fully off-screen right */
-    100% { background-position: 10% 0; }  /* pause before next sweep          */
+    0% {
+        background-position: 80% 0;
+    } /* highlight just off-screen left  */
+    50% {
+        background-position: 10% 0;
+    } /* highlight fully off-screen right */
+    100% {
+        background-position: 10% 0;
+    } /* pause before next sweep          */
 }
 
 /* Reduced motion: skip all heading animations */
@@ -270,17 +276,17 @@ h3 {
 .hero__search-wrap {
     position: relative;
     width: 100%;
-    max-width: 680px;
-    border-radius: 16px;
+    max-width: 720px;
+    border-radius: 9999px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 32px rgba(0, 0, 0, 0.06);
 }
 .hero__search {
     display: flex;
     align-items: center;
     background-color: var(--ct-bg);
-    border-radius: 13px;
+    border-radius: 9999px;
     border: none;
-    padding: 8px;
+    padding: 4px 4px 4px 16px;
     gap: 8px;
     width: 100%;
 }
@@ -289,7 +295,6 @@ h3 {
 }
 .hero__search-icon {
     flex-shrink: 0;
-    margin-left: 8px;
     color: var(--ct-text-muted);
 }
 .hero__search-input {
@@ -300,8 +305,8 @@ h3 {
     font-size: 16px;
     font-family: var(--ct-font);
     color: var(--ct-text-main);
-    padding: 8px;
-    min-height: 40px;
+    padding: 12px 8px;
+    min-height: 44px;
 }
 .hero__search-input::placeholder {
     color: var(--ct-text-muted);
@@ -311,10 +316,10 @@ h3 {
     color: #fff;
     font-size: 14px;
     font-weight: 600;
-    padding: 12px 20px;
-    border-radius: 12px;
+    padding: 12px 28px;
+    border-radius: 9999px;
     white-space: nowrap;
-    min-height: 40px;
+    min-height: 44px;
     box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
     transition: opacity 200ms, box-shadow 200ms;
     display: none;

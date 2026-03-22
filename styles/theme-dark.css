@@ -184,7 +184,6 @@ h3 {
 
 /* Hero */
 .hero {
-    background-color: var(--ct-bg-soft);
     background-image: radial-gradient(
         ellipse at 50% 0%,
         rgba(96, 165, 250, 0.06) 0%,

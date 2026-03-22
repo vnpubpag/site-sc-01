@@ -1,21 +1,30 @@
 /* =============================================
-   THEME: Modern
-   chitiet.vn – Minimal Design Rules v1.0
+   THEME: Glass
+   chitiet.vn – Glassmorphism Design
    =============================================
-   Single accent swap: blue → indigo/violet
-   Still 1 accent only, all token names identical.
+   Frosted-glass surfaces with backdrop blur,
+   translucent backgrounds, and soft luminous borders.
    ============================================= */
 
 :root {
     --ct-primary: #1e1b4b;
-    --ct-accent: #6d28d9;
-    --ct-bg: #ffffff;
-    --ct-bg-soft: #f5f3ff;
+    --ct-accent: #7c3aed;
+    --ct-bg: #f0ecff;
+    --ct-bg-soft: rgba(255, 255, 255, 0.45);
     --ct-text-main: #1e1b4b;
     --ct-text-muted: #6b7280;
-    --ct-border: #ddd6fe;
+    --ct-border: rgba(255, 255, 255, 0.6);
     --ct-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    --ct-grid: rgba(30, 27, 75, 0.03);
+    --ct-grid: rgba(30, 27, 75, 0.025);
+
+    /* Glass tokens */
+    --ct-glass-bg: rgba(255, 255, 255, 0.42);
+    --ct-glass-bg-hover: rgba(255, 255, 255, 0.58);
+    --ct-glass-border: rgba(255, 255, 255, 0.55);
+    --ct-glass-border-hover: rgba(124, 58, 237, 0.35);
+    --ct-glass-blur: 16px;
+    --ct-glass-shadow: 0 4px 24px rgba(124, 58, 237, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+    --ct-glass-shadow-hover: 0 8px 32px rgba(124, 58, 237, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
 *,
@@ -36,9 +45,11 @@ body {
     background-color: var(--ct-bg);
     color: var(--ct-text-main);
     background-image:
+        radial-gradient(ellipse at 20% 0%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(167, 139, 250, 0.07) 0%, transparent 50%),
         linear-gradient(var(--ct-grid) 1px, transparent 1px),
         linear-gradient(90deg, var(--ct-grid) 1px, transparent 1px);
-    background-size: 32px 32px;
+    background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
 }
 a {
     color: inherit;
@@ -85,13 +96,15 @@ h3 {
     min-height: 100vh;
 }
 
-/* Header */
+/* Header – Glass */
 .site-header {
     position: sticky;
     top: 0;
     z-index: 50;
-    background-color: var(--ct-bg);
-    border-bottom: 1px solid var(--ct-border);
+    background: rgba(240, 236, 255, 0.65);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    backdrop-filter: blur(20px) saturate(1.4);
+    border-bottom: 1px solid var(--ct-glass-border);
 }
 .site-header__inner {
     max-width: 1200px;
@@ -145,15 +158,17 @@ h3 {
     font-size: 14px;
     font-weight: 600;
     color: var(--ct-text-muted);
-    transition: color 200ms;
+    transition: color 200ms, background 200ms;
     background: none;
     border: none;
-    padding: 0;
+    padding: 6px 16px;
+    border-radius: 9999px;
     cursor: pointer;
     font-family: inherit;
 }
 .site-nav__link:hover {
     color: var(--ct-accent);
+    background: var(--ct-glass-bg);
 }
 
 /* Theme Switcher */
@@ -174,20 +189,23 @@ h3 {
     font-weight: 600;
     color: var(--ct-text-muted);
     transition:
-        background-color 200ms,
-        color 200ms;
+        background 200ms,
+        color 200ms,
+        border-color 200ms;
 }
 .theme-switcher__btn:hover {
-    background-color: var(--ct-bg-soft);
+    background: var(--ct-glass-bg);
+    -webkit-backdrop-filter: blur(var(--ct-glass-blur));
+    backdrop-filter: blur(var(--ct-glass-blur));
+    border: 1px solid var(--ct-glass-border);
     color: var(--ct-text-main);
 }
 
-/* Hero */
+/* Hero – Glass */
 .hero {
-    background-color: var(--ct-bg-soft);
     background-image: radial-gradient(
         ellipse at 50% 0%,
-        rgba(109, 40, 217, 0.045) 0%,
+        rgba(124, 58, 237, 0.06) 0%,
         transparent 70%
     );
     padding: 64px 24px 52px;
@@ -278,20 +296,24 @@ h3 {
     width: 100%;
     max-width: 720px;
     border-radius: 9999px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 32px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--ct-glass-shadow);
 }
 .hero__search {
     display: flex;
     align-items: center;
-    background-color: var(--ct-bg);
+    background: var(--ct-glass-bg-hover);
+    -webkit-backdrop-filter: blur(var(--ct-glass-blur));
+    backdrop-filter: blur(var(--ct-glass-blur));
     border-radius: 9999px;
-    border: none;
+    border: 1px solid var(--ct-glass-border);
     padding: 4px 4px 4px 16px;
     gap: 8px;
     width: 100%;
+    transition: border-color 200ms, box-shadow 200ms;
 }
 .hero__search:focus-within {
-    background-color: var(--ct-bg);
+    border-color: var(--ct-glass-border-hover);
+    box-shadow: var(--ct-glass-shadow-hover);
 }
 .hero__search-icon {
     flex-shrink: 0;
@@ -312,7 +334,7 @@ h3 {
     color: var(--ct-text-muted);
 }
 .hero__search-btn {
-    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
     color: #fff;
     font-size: 14px;
     font-weight: 600;
@@ -320,13 +342,13 @@ h3 {
     border-radius: 9999px;
     white-space: nowrap;
     min-height: 44px;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
-    transition: opacity 200ms, box-shadow 200ms;
+    box-shadow: 0 2px 12px rgba(124, 58, 237, 0.3);
+    transition: transform 200ms, box-shadow 200ms;
     display: none;
 }
 .hero__search-btn:hover {
-    opacity: 0.92;
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
 }
 @media (min-width: 640px) {
     .hero__search-btn {
@@ -385,16 +407,20 @@ h3 {
 }
 .hero__feed-item {
     padding: 6px 16px;
-    background-color: var(--ct-bg);
-    border: 1px solid var(--ct-border);
+    background: var(--ct-glass-bg);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--ct-glass-border);
     border-radius: 9999px;
     transition:
         border-color 200ms,
-        background-color 200ms;
+        background 200ms,
+        box-shadow 200ms;
 }
 .hero__feed-item:hover {
-    border-color: var(--ct-accent);
-    background-color: var(--ct-bg-soft);
+    border-color: var(--ct-glass-border-hover);
+    background: var(--ct-glass-bg-hover);
+    box-shadow: 0 2px 12px rgba(124, 58, 237, 0.08);
 }
 .hero__feed-item a {
     font-size: 13px;
@@ -448,21 +474,25 @@ h3 {
     padding-left: 12px;
 }
 
-/* Search Box */
+/* Search Box – Glass */
 .search-box {
     display: flex;
     align-items: center;
-    background-color: var(--ct-bg);
+    background: var(--ct-glass-bg);
+    -webkit-backdrop-filter: blur(var(--ct-glass-blur));
+    backdrop-filter: blur(var(--ct-glass-blur));
     border-radius: 9999px;
-    border: 1px solid var(--ct-border);
+    border: 1px solid var(--ct-glass-border);
     padding: 0 16px;
     gap: 8px;
     min-width: 240px;
     min-height: 40px;
-    transition: border-color 200ms;
+    box-shadow: var(--ct-glass-shadow);
+    transition: border-color 200ms, box-shadow 200ms;
 }
 .search-box:focus-within {
-    border-color: var(--ct-accent);
+    border-color: var(--ct-glass-border-hover);
+    box-shadow: var(--ct-glass-shadow-hover);
 }
 .search-box__icon {
     flex-shrink: 0;
@@ -511,24 +541,29 @@ h3 {
     }
 }
 
-/* Cards */
+/* Cards – Glass */
 .card {
-    background-color: var(--ct-bg-soft);
-    border-radius: 12px;
-    border: 1px solid var(--ct-border);
+    background: var(--ct-glass-bg);
+    -webkit-backdrop-filter: blur(var(--ct-glass-blur));
+    backdrop-filter: blur(var(--ct-glass-blur));
+    border-radius: 16px;
+    border: 1px solid var(--ct-glass-border);
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    transition: border-color 200ms;
+    box-shadow: var(--ct-glass-shadow);
+    transition: border-color 250ms, box-shadow 250ms, transform 250ms;
 }
 .card:hover {
-    border-color: var(--ct-accent);
+    border-color: var(--ct-glass-border-hover);
+    box-shadow: var(--ct-glass-shadow-hover);
+    transform: translateY(-2px);
 }
 .card__image-wrap {
     aspect-ratio: 1;
     overflow: hidden;
-    background-color: var(--ct-bg);
-    border-bottom: 1px solid var(--ct-border);
+    background: rgba(255, 255, 255, 0.25);
+    border-bottom: 1px solid var(--ct-glass-border);
 }
 .card__image-placeholder {
     width: 100%;
@@ -536,7 +571,7 @@ h3 {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--ct-bg-soft);
+    background: rgba(255, 255, 255, 0.15);
 }
 .card__image-initial {
     font-size: 40px;
@@ -607,8 +642,8 @@ h3 {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--ct-bg);
-    border: 1px solid var(--ct-border);
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--ct-glass-border);
     margin-bottom: 16px;
     flex-shrink: 0;
 }
@@ -643,20 +678,26 @@ h3 {
     font-size: 14px;
     font-weight: 600;
     color: var(--ct-accent);
-    border: 1px solid var(--ct-border);
-    background-color: var(--ct-bg);
+    border: 1px solid var(--ct-glass-border);
+    background: rgba(255, 255, 255, 0.45);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     transition:
-        border-color 150ms,
-        background-color 150ms;
+        border-color 200ms,
+        background 200ms,
+        box-shadow 200ms,
+        transform 200ms;
     margin-top: auto;
     min-height: 40px;
 }
 .card__btn:hover {
-    border-color: var(--ct-accent);
-    background-color: var(--ct-bg-soft);
+    border-color: var(--ct-glass-border-hover);
+    background: rgba(124, 58, 237, 0.08);
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.1);
+    transform: translateY(-1px);
 }
 
-/* Pagination */
+/* Pagination – Glass */
 .pagination {
     display: flex;
     align-items: center;
@@ -676,19 +717,23 @@ h3 {
     align-items: center;
     justify-content: center;
     border-radius: 12px;
-    border: 1px solid var(--ct-border);
-    background-color: var(--ct-bg);
+    border: 1px solid var(--ct-glass-border);
+    background: var(--ct-glass-bg);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
     color: var(--ct-text-muted);
     font-size: 14px;
     font-weight: 600;
     transition:
         border-color 200ms,
-        color 200ms;
+        color 200ms,
+        background 200ms;
     cursor: pointer;
 }
 .pagination__btn:hover:not(:disabled) {
-    border-color: var(--ct-accent);
+    border-color: var(--ct-glass-border-hover);
     color: var(--ct-accent);
+    background: var(--ct-glass-bg-hover);
 }
 .pagination__btn:disabled {
     opacity: 0.35;
@@ -697,12 +742,15 @@ h3 {
 .pagination__btn--active {
     border-color: var(--ct-accent);
     color: var(--ct-accent);
+    background: rgba(124, 58, 237, 0.08);
     font-weight: 700;
 }
 
-/* Footer */
+/* Footer – Glass */
 .site-footer {
-    background-color: var(--ct-primary);
+    background: linear-gradient(135deg, rgba(30, 27, 75, 0.95), rgba(30, 27, 75, 0.88));
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     color: rgba(237, 233, 254, 0.65);
     padding: 48px 24px;
 }
@@ -716,7 +764,7 @@ h3 {
     gap: 24px;
     padding-bottom: 32px;
     margin-bottom: 32px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 @media (min-width: 768px) {
     .site-footer__top {

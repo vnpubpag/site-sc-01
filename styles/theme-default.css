@@ -223,12 +223,13 @@ h3 {
     text-align: center;
     gap: 24px;
 }
-.hero__eyebrow {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--ct-accent);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
+.hero__subtext {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--ct-text-muted);
+    line-height: 1.7;
+    max-width: 600px;
+    margin-top: -12px;
 }
 .hero__heading {
     color: var(--ct-text-main);
@@ -240,17 +241,60 @@ h3 {
 }
 @media (min-width: 640px) {
     .hero__heading {
-        font-size: 56px;
+        font-size: 44px;
+    }
+}
+
+/* Stage 1: Typing — each char fades in with staggered delay */
+.hero__char {
+    opacity: 0;
+    animation: heroCharIn 60ms ease-out forwards;
+    animation-delay: calc(var(--i) * 50ms);
+}
+@keyframes heroCharIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Stage 2: Glow sweep — activated by JS after typing completes */
+.hero__heading--glow {
+    background: linear-gradient(
+        90deg,
+        var(--ct-text-main) 0%,
+        var(--ct-text-main) 40%,
+        var(--ct-accent, #4a8eff) 50%,
+        var(--ct-text-main) 60%,
+        var(--ct-text-main) 100%
+    );
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: heroGlow 4s linear infinite;
+}
+@keyframes heroGlow {
+    0%   { background-position: 80% 0; }  /* highlight just off-screen left  */
+    50%  { background-position: 10% 0; }  /* highlight fully off-screen right */
+    100% { background-position: 10% 0; }  /* pause before next sweep          */
+}
+
+/* Reduced motion: skip all heading animations */
+@media (prefers-reduced-motion: reduce) {
+    .hero__char {
+        opacity: 1;
+        animation: none;
+    }
+    .hero__heading--glow {
+        animation: none;
     }
 }
 .hero__search-wrap {
     position: relative;
     width: 100%;
     max-width: 720px;
-    padding: 2px;
     border-radius: 9999px;
-    background: linear-gradient(to right, #f97316, #0d46f2, #8b5cf6);
-    box-shadow: 0 8px 32px rgba(13, 70, 242, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 32px rgba(0, 0, 0, 0.06);
 }
 .hero__search {
     display: flex;
@@ -284,7 +328,7 @@ h3 {
     color: var(--ct-text-muted);
 }
 .hero__search-btn {
-    background-color: #111827;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
     color: #fff;
     font-size: 14px;
     font-weight: 600;
@@ -292,11 +336,13 @@ h3 {
     border-radius: 9999px;
     white-space: nowrap;
     min-height: 44px;
-    transition: background-color 150ms;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+    transition: opacity 200ms, box-shadow 200ms;
     display: none;
 }
 .hero__search-btn:hover {
-    background-color: #1e293b;
+    opacity: 0.92;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.5);
 }
 @media (min-width: 640px) {
     .hero__search-btn {
@@ -343,7 +389,7 @@ h3 {
 .hero__feed-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 8px;
     list-style: none;
     padding: 0;
     margin: 0;
@@ -355,7 +401,7 @@ h3 {
     opacity: 1;
 }
 .hero__feed-item {
-    padding: 10px 24px;
+    padding: 6px 16px;
     background-color: var(--ct-bg);
     border: 1px solid var(--ct-border);
     border-radius: 9999px;

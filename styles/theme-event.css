@@ -185,7 +185,11 @@ h3 {
 /* Hero */
 .hero {
     background-color: var(--ct-bg-soft);
-    background-image: radial-gradient(ellipse at 50% 0%, rgba(109, 40, 217, 0.045) 0%, transparent 70%);
+    background-image: radial-gradient(
+        ellipse at 50% 0%,
+        rgba(109, 40, 217, 0.045) 0%,
+        transparent 70%
+    );
     padding: 64px 24px 52px;
 }
 .hero__inner {
@@ -199,12 +203,13 @@ h3 {
     text-align: center;
     gap: 20px;
 }
-.hero__eyebrow {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--ct-accent);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+.hero__subtext {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--ct-text-muted);
+    line-height: 1.7;
+    max-width: 600px;
+    margin-top: -8px;
 }
 .hero__heading {
     color: var(--ct-text-main);
@@ -214,36 +219,60 @@ h3 {
 }
 @media (min-width: 640px) {
     .hero__heading {
-        font-size: 40px;
+        font-size: 44px;
+    }
+}
+
+/* Stage 1: Typing — each char fades in with staggered delay */
+.hero__char {
+    opacity: 0;
+    animation: heroCharIn 60ms ease-out forwards;
+    animation-delay: calc(var(--i) * 50ms);
+}
+@keyframes heroCharIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Stage 2: Glow sweep — activated by JS after typing completes */
+.hero__heading--glow {
+    background: linear-gradient(
+        90deg,
+        var(--ct-text-main) 0%,
+        var(--ct-text-main) 40%,
+        var(--ct-accent, #4a8eff) 50%,
+        var(--ct-text-main) 60%,
+        var(--ct-text-main) 100%
+    );
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: heroGlow 4s linear infinite;
+}
+@keyframes heroGlow {
+    0%   { background-position: 80% 0; }  /* highlight just off-screen left  */
+    50%  { background-position: 10% 0; }  /* highlight fully off-screen right */
+    100% { background-position: 10% 0; }  /* pause before next sweep          */
+}
+
+/* Reduced motion: skip all heading animations */
+@media (prefers-reduced-motion: reduce) {
+    .hero__char {
+        opacity: 1;
+        animation: none;
+    }
+    .hero__heading--glow {
+        animation: none;
     }
 }
 .hero__search-wrap {
     position: relative;
     width: 100%;
     max-width: 680px;
-    padding: 3px;
     border-radius: 16px;
-    background: linear-gradient(
-        135deg,
-        #6366f1,
-        #a855f7,
-        #ec4899,
-        #f97316,
-        #6366f1
-    );
-    background-size: 300% 300%;
-    animation: hero-glow 6s ease infinite;
-}
-@keyframes hero-glow {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 32px rgba(0, 0, 0, 0.06);
 }
 .hero__search {
     display: flex;
@@ -278,19 +307,21 @@ h3 {
     color: var(--ct-text-muted);
 }
 .hero__search-btn {
-    background-color: var(--ct-accent);
-    color: #ffffff;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    color: #fff;
     font-size: 14px;
     font-weight: 600;
     padding: 12px 20px;
     border-radius: 12px;
     white-space: nowrap;
     min-height: 40px;
-    transition: opacity 150ms;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+    transition: opacity 200ms, box-shadow 200ms;
     display: none;
 }
 .hero__search-btn:hover {
-    opacity: 0.88;
+    opacity: 0.92;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.5);
 }
 @media (min-width: 640px) {
     .hero__search-btn {
@@ -527,7 +558,9 @@ h3 {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    transition: color 0.3s ease, background-size 0.4s ease;
+    transition:
+        color 0.3s ease,
+        background-size 0.4s ease;
     background-size: 100% 100%;
     background-clip: text;
     -webkit-background-clip: text;
@@ -547,8 +580,13 @@ h3 {
     animation: twinkle-shift 2s ease-in-out infinite;
 }
 @keyframes twinkle-shift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
 }
 .card--tool,
 .card--fun,

@@ -112,612 +112,220 @@ function upscaleAfterWarp(src) {
     return dst;
 }
 
-function clampMat(mat) {
-    var data = mat.data;
-    for (var i = 0; i < data.length; i++) {
-        if (data[i] < 0) data[i] = 0;
-        else if (data[i] > 255) data[i] = 255;
-    }
+/* ══════════════════════════════════════════
+   Scan Filter — simple background-whitening
+   Keeps text pixels untouched; only lightens
+   the background toward paper-white.
+   ══════════════════════════════════════════ */
+
+/** Tunable defaults (exposed so they can be overridden later) */
+var SCAN_FILTER_DILATION_SIZE = 3;     // 3 = conservative (more bg whitened), 5 = aggressive (wider text protection)
+var SCAN_FILTER_MASK_SIGMA = 0;        // 0 = auto (2.5% of longest edge, min 18) — used to normalize gray before Otsu
+var SCAN_FILTER_BG_NORMALIZE_SIGMA = 0; // 0 = auto — used to flatten lighting on output L channel
+var SCAN_FILTER_BLEND_ALPHA = 1.0;     // 1.0 = background becomes exact PAPER_COLOR, matching padding perfectly
+
+/** Unified paper tone — RGB (248, 246, 240) */
+var PAPER_COLOR_R = 248;
+var PAPER_COLOR_G = 246;
+var PAPER_COLOR_B = 240;
+
+/**
+ * Lazily computed Lab values for PAPER_COLOR.
+ * Filled once on first applyScanFilter call via _ensurePaperLab().
+ */
+var PAPER_LAB_L = 0;
+var PAPER_LAB_A = 0;
+var PAPER_LAB_B = 0;
+var _paperLabReady = false;
+
+function _ensurePaperLab() {
+    if (_paperLabReady) return;
+    // Build a 1×1 RGB mat, convert to Lab, read values
+    var px = cv.matFromArray(1, 1, cv.CV_8UC3, [PAPER_COLOR_R, PAPER_COLOR_G, PAPER_COLOR_B]);
+    var labPx = new cv.Mat();
+    cv.cvtColor(px, labPx, cv.COLOR_RGB2Lab);
+    PAPER_LAB_L = labPx.data[0];
+    PAPER_LAB_A = labPx.data[1];
+    PAPER_LAB_B = labPx.data[2];
+    px.delete();
+    labPx.delete();
+    _paperLabReady = true;
 }
 
-function clampUnit(value, fallback) {
-    if (typeof value !== "number" || isNaN(value)) return fallback;
-    return Math.max(0, Math.min(100, value));
-}
-
-function mixRange(min, max, amount) {
-    return min + (max - min) * amount;
-}
-
-function normalizeOdd(value) {
-    var rounded = Math.max(3, Math.round(value));
-    return rounded % 2 === 0 ? rounded + 1 : rounded;
-}
-
-function getScanFilterSettings() {
-    var textSensitivity = 28 / 100;
-    var textProtection = 96 / 100;
-    var paperDetection = 42 / 100;
-    var backgroundWhitening = 8 / 100;
-    var colorPreservation = 92 / 100;
-
-    return {
-        textSensitivity: textSensitivity,
-        textProtection: textProtection,
-        paperDetection: paperDetection,
-        backgroundWhitening: backgroundWhitening,
-        colorPreservation: colorPreservation,
-        paperSaturationLimit: Math.round(mixRange(84, 66, paperDetection)),
-        paperLightFloor: Math.round(mixRange(146, 128, paperDetection)),
-        textAdaptiveBlockSize: normalizeOdd(mixRange(43, 33, textSensitivity)),
-        textAdaptiveC: Math.round(mixRange(16, 12, textSensitivity)),
-        textMaskFallbackCoverage: mixRange(0.0042, 0.0024, textSensitivity),
-        textRestoreKernel: normalizeOdd(mixRange(3, 5, textProtection)),
-        textRestoreIterations: textProtection > 0.72 ? 2 : 1,
-        protectedTextKernel: normalizeOdd(mixRange(7, 9, textProtection)),
-        protectedTextIterations: textProtection > 0.68 ? 2 : 1,
-        colorSaturationThreshold: Math.round(
-            mixRange(74, 44, colorPreservation),
-        ),
-        colorValueThreshold: Math.round(mixRange(84, 58, colorPreservation)),
-        protectedColorKernel: normalizeOdd(mixRange(3, 5, colorPreservation)),
-        protectedColorIterations: colorPreservation > 0.55 ? 2 : 1,
-        whitenBlend: mixRange(0.06, 0.28, backgroundWhitening),
-        chromaNeutralizeBlend: mixRange(0.05, 0.22, backgroundWhitening),
-        foregroundRestoreBlend: mixRange(0.975, 0.998, colorPreservation),
-        transitionPaperBlend: mixRange(0.03, 0.16, backgroundWhitening),
-        sharpenSigma: mixRange(0.48, 0.6, 1 - backgroundWhitening),
-        sharpenAmount: mixRange(0, 0.0025, 1 - textProtection * 0.98),
-    };
-}
-
-function createPaperMask(rgb, normalizedL, saturationLimit, lightFloor) {
-    var hsv = new cv.Mat();
-    var hsvChannels = new cv.MatVector();
-    var saturation = null;
-    var saturationMask = new cv.Mat();
-    var lightMask = new cv.Mat();
-    var paperMask = new cv.Mat();
-    var closeKernel = cv.getStructuringElement(
-        cv.MORPH_ELLIPSE,
-        new cv.Size(5, 5),
-    );
-    var openKernel = cv.getStructuringElement(
-        cv.MORPH_ELLIPSE,
-        new cv.Size(3, 3),
-    );
-
-    try {
-        cv.cvtColor(rgb, hsv, cv.COLOR_RGB2HSV);
-        cv.split(hsv, hsvChannels);
-        saturation = hsvChannels.get(1);
-        cv.threshold(
-            saturation,
-            saturationMask,
-            saturationLimit,
-            255,
-            cv.THRESH_BINARY_INV,
-        );
-        cv.threshold(normalizedL, lightMask, lightFloor, 255, cv.THRESH_BINARY);
-        cv.bitwise_and(saturationMask, lightMask, paperMask);
-        cv.morphologyEx(paperMask, paperMask, cv.MORPH_CLOSE, closeKernel);
-        cv.morphologyEx(paperMask, paperMask, cv.MORPH_OPEN, openKernel);
-        return paperMask.clone();
-    } finally {
-        hsv.delete();
-        hsvChannels.delete();
-        if (saturation) saturation.delete();
-        saturationMask.delete();
-        lightMask.delete();
-        paperMask.delete();
-        closeKernel.delete();
-        openKernel.delete();
-    }
-}
-
-function smoothPaperBackground(rgb, paperMask) {
-    if (!paperMask || cv.countNonZero(paperMask) === 0) return;
-
-    var softened = new cv.Mat();
-    var denoised = new cv.Mat();
-
-    try {
-        cv.GaussianBlur(rgb, softened, new cv.Size(0, 0), 1.1);
-        softened.copyTo(rgb, paperMask);
-        cv.medianBlur(rgb, denoised, 3);
-        denoised.copyTo(rgb, paperMask);
-    } finally {
-        softened.delete();
-        denoised.delete();
-    }
-}
-
-function harmonizePaperEdges(rgb, paperMask) {
-    if (!paperMask || cv.countNonZero(paperMask) === 0) return;
-
-    var rows = rgb.rows;
-    var cols = rgb.cols;
-    var bandX = Math.max(8, Math.round(cols * 0.055));
-    var bandY = Math.max(8, Math.round(rows * 0.04));
-    var edgeWindow = cv.Mat.zeros(rows, cols, cv.CV_8UC1);
-    var sampleWindow = cv.Mat.zeros(rows, cols, cv.CV_8UC1);
-    var edgePaperMask = new cv.Mat();
-    var samplePaperMask = new cv.Mat();
-    var softened = new cv.Mat();
-    var blended = new cv.Mat();
-    var paperTone = null;
-
-    try {
-        cv.rectangle(
-            edgeWindow,
-            new cv.Point(0, 0),
-            new cv.Point(cols - 1, bandY),
-            new cv.Scalar(255),
-            -1,
-        );
-        cv.rectangle(
-            edgeWindow,
-            new cv.Point(0, rows - bandY),
-            new cv.Point(cols - 1, rows - 1),
-            new cv.Scalar(255),
-            -1,
-        );
-        cv.rectangle(
-            edgeWindow,
-            new cv.Point(0, 0),
-            new cv.Point(bandX, rows - 1),
-            new cv.Scalar(255),
-            -1,
-        );
-        cv.rectangle(
-            edgeWindow,
-            new cv.Point(cols - bandX, 0),
-            new cv.Point(cols - 1, rows - 1),
-            new cv.Scalar(255),
-            -1,
-        );
-
-        cv.bitwise_and(paperMask, edgeWindow, edgePaperMask);
-        if (cv.countNonZero(edgePaperMask) < rows * cols * 0.0025) return;
-
-        cv.rectangle(
-            sampleWindow,
-            new cv.Point(
-                Math.round(cols * 0.12),
-                Math.round(rows * 0.12),
-            ),
-            new cv.Point(
-                Math.round(cols * 0.88),
-                Math.round(rows * 0.88),
-            ),
-            new cv.Scalar(255),
-            -1,
-        );
-        cv.bitwise_and(paperMask, sampleWindow, samplePaperMask);
-        if (cv.countNonZero(samplePaperMask) < rows * cols * 0.02) {
-            paperMask.copyTo(samplePaperMask);
-        }
-
-        var meanColor = cv.mean(rgb, samplePaperMask);
-        paperTone = new cv.Mat(
-            rows,
-            cols,
-            rgb.type(),
-            new cv.Scalar(meanColor[0], meanColor[1], meanColor[2], 0),
-        );
-        cv.GaussianBlur(rgb, softened, new cv.Size(0, 0), 2.2);
-        cv.addWeighted(softened, 0.78, paperTone, 0.22, 0, blended);
-        blended.copyTo(rgb, edgePaperMask);
-    } finally {
-        edgeWindow.delete();
-        sampleWindow.delete();
-        edgePaperMask.delete();
-        samplePaperMask.delete();
-        softened.delete();
-        blended.delete();
-        if (paperTone) paperTone.delete();
-    }
-}
-
-function normalizePaperLighting(lChannel) {
-    var background = new cv.Mat();
-    var normalized = new cv.Mat();
-    var l32 = new cv.Mat();
-    var bg32 = new cv.Mat();
-    var sigma = Math.max(18, Math.round(Math.max(lChannel.cols, lChannel.rows) * 0.025));
-
-    try {
-        cv.GaussianBlur(lChannel, background, new cv.Size(0, 0), sigma);
-        lChannel.convertTo(l32, cv.CV_32F);
-        background.convertTo(bg32, cv.CV_32F);
-        bg32.convertTo(bg32, -1, 1, 12);
-        cv.divide(l32, bg32, l32, 236);
-        l32.convertTo(normalized, cv.CV_8U);
-        return normalized.clone();
-    } finally {
-        background.delete();
-        normalized.delete();
-        l32.delete();
-        bg32.delete();
-    }
-}
-
-function createTextMask(lChannel, settings) {
-    var otsuMask = new cv.Mat();
-    var adaptiveMask = new cv.Mat();
-    var textMask = new cv.Mat();
-    var closeKernel = cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(3, 3));
-    var openKernel = cv.getStructuringElement(
-        cv.MORPH_ELLIPSE,
-        new cv.Size(2, 2),
-    );
-
-    try {
-        cv.threshold(
-            lChannel,
-            otsuMask,
-            0,
-            255,
-            cv.THRESH_BINARY_INV + cv.THRESH_OTSU,
-        );
-        cv.adaptiveThreshold(
-            lChannel,
-            adaptiveMask,
-            255,
-            cv.ADAPTIVE_THRESH_GAUSSIAN_C,
-            cv.THRESH_BINARY_INV,
-            settings.textAdaptiveBlockSize,
-            settings.textAdaptiveC,
-        );
-        cv.bitwise_and(otsuMask, adaptiveMask, textMask);
-        if (
-            cv.countNonZero(textMask) <
-            lChannel.rows * lChannel.cols * settings.textMaskFallbackCoverage
-        ) {
-            cv.bitwise_or(otsuMask, adaptiveMask, textMask);
-        }
-        cv.morphologyEx(textMask, textMask, cv.MORPH_CLOSE, closeKernel);
-        cv.morphologyEx(textMask, textMask, cv.MORPH_OPEN, openKernel);
-        return textMask.clone();
-    } finally {
-        otsuMask.delete();
-        textMask.delete();
-        adaptiveMask.delete();
-        closeKernel.delete();
-        openKernel.delete();
-    }
-}
-
-function createTextSupportMask(lChannel, coreMask, settings) {
-    var otsuMask = new cv.Mat();
-    var adaptiveMask = new cv.Mat();
-    var looseMask = new cv.Mat();
-    var blackhat = new cv.Mat();
-    var strokeMask = new cv.Mat();
-    var strokeSupport = new cv.Mat();
-    var expandedCore = new cv.Mat();
-    var supportMask = new cv.Mat();
-    var closeKernel = cv.getStructuringElement(
-        cv.MORPH_ELLIPSE,
-        new cv.Size(3, 3),
-    );
-    var strokeKernel = cv.getStructuringElement(
-        cv.MORPH_ELLIPSE,
-        new cv.Size(9, 9),
-    );
-
-    try {
-        cv.threshold(
-            lChannel,
-            otsuMask,
-            0,
-            255,
-            cv.THRESH_BINARY_INV + cv.THRESH_OTSU,
-        );
-        cv.adaptiveThreshold(
-            lChannel,
-            adaptiveMask,
-            255,
-            cv.ADAPTIVE_THRESH_GAUSSIAN_C,
-            cv.THRESH_BINARY_INV,
-            normalizeOdd(settings.textAdaptiveBlockSize + 8),
-            Math.max(4, settings.textAdaptiveC - 3),
-        );
-        cv.bitwise_or(otsuMask, adaptiveMask, looseMask);
-        cv.morphologyEx(lChannel, blackhat, cv.MORPH_BLACKHAT, strokeKernel);
-        cv.threshold(
-            blackhat,
-            strokeMask,
-            Math.max(4, settings.textAdaptiveC - 1),
-            255,
-            cv.THRESH_BINARY,
-        );
-        cv.dilate(
-            coreMask,
-            expandedCore,
-            closeKernel,
-            new cv.Point(-1, -1),
-            3,
-        );
-        cv.bitwise_and(strokeMask, expandedCore, strokeSupport);
-        cv.bitwise_or(looseMask, strokeSupport, supportMask);
-        cv.bitwise_and(supportMask, expandedCore, supportMask);
-        cv.morphologyEx(supportMask, supportMask, cv.MORPH_CLOSE, closeKernel);
-        return supportMask.clone();
-    } finally {
-        otsuMask.delete();
-        adaptiveMask.delete();
-        looseMask.delete();
-        blackhat.delete();
-        strokeMask.delete();
-        strokeSupport.delete();
-        expandedCore.delete();
-        supportMask.delete();
-        closeKernel.delete();
-        strokeKernel.delete();
-    }
-}
-
-function expandMask(mask, kernelSize, iterations) {
-    var expanded = new cv.Mat();
-    var kernel = cv.getStructuringElement(
-        cv.MORPH_ELLIPSE,
-        new cv.Size(kernelSize, kernelSize),
-    );
-
-    try {
-        cv.dilate(mask, expanded, kernel, new cv.Point(-1, -1), iterations);
-        return expanded.clone();
-    } finally {
-        expanded.delete();
-        kernel.delete();
-    }
-}
-
-function createColorForegroundMask(rgb, settings) {
-    var hsv = new cv.Mat();
-    var hsvChannels = new cv.MatVector();
-    var saturation = null;
-    var value = null;
-    var saturationMask = new cv.Mat();
-    var valueMask = new cv.Mat();
-    var colorMask = new cv.Mat();
-    var closeKernel = cv.getStructuringElement(
-        cv.MORPH_ELLIPSE,
-        new cv.Size(3, 3),
-    );
-
-    try {
-        cv.cvtColor(rgb, hsv, cv.COLOR_RGB2HSV);
-        cv.split(hsv, hsvChannels);
-        saturation = hsvChannels.get(1);
-        value = hsvChannels.get(2);
-        cv.threshold(
-            saturation,
-            saturationMask,
-            settings.colorSaturationThreshold,
-            255,
-            cv.THRESH_BINARY,
-        );
-        cv.threshold(
-            value,
-            valueMask,
-            settings.colorValueThreshold,
-            255,
-            cv.THRESH_BINARY,
-        );
-        cv.bitwise_and(saturationMask, valueMask, colorMask);
-        cv.morphologyEx(colorMask, colorMask, cv.MORPH_CLOSE, closeKernel);
-        return colorMask.clone();
-    } finally {
-        hsv.delete();
-        hsvChannels.delete();
-        if (saturation) saturation.delete();
-        if (value) value.delete();
-        saturationMask.delete();
-        valueMask.delete();
-        colorMask.delete();
-        closeKernel.delete();
-    }
-}
-
+/**
+ * Scan filter pipeline — shadow-resistant mask + background-only processing.
+ *
+ * Mask path (shadow-resistant):
+ *  1. RGBA → Gray
+ *  2. Normalize gray to flatten shadows: normalizedGray = gray / blur(gray) * mean(blur)
+ *  3. Otsu threshold on normalizedGray → textMask
+ *  4. Dilate textMask → dilatedText; invert → bgMask
+ *  NOTE: normalizedGray is ONLY used for mask — never for output.
+ *
+ * Output path (original quality):
+ *  5a. Soft normalize L-channel on bgMask only
+ *  5b. Blend background Lab toward PAPER_COLOR (unified paper tone)
+ *  6.  Merge Lab → RGB; restore original text pixels; → RGBA
+ *
+ * @param {cv.Mat} src  RGBA input (from matFromImageData)
+ * @returns {cv.Mat} RGBA output — caller must delete()
+ */
 function applyScanFilter(src) {
-    var settings = getScanFilterSettings();
-    var resized = src.clone();
+    // -- Mask path variables --
+    var gray = new cv.Mat();
+    var maskBlur = new cv.Mat();
+    var gray32 = new cv.Mat();
+    var maskBlur32 = new cv.Mat();
+    var normalizedGray = new cv.Mat();
+    var textMask = new cv.Mat();
+    var dilatedText = new cv.Mat();
+    var bgMask = new cv.Mat();
+    var dilateKernel = cv.getStructuringElement(
+        cv.MORPH_ELLIPSE,
+        new cv.Size(SCAN_FILTER_DILATION_SIZE, SCAN_FILTER_DILATION_SIZE),
+    );
+    // -- Output path variables --
     var rgb = new cv.Mat();
     var lab = new cv.Mat();
     var labChannels = new cv.MatVector();
     var l = null;
     var a = null;
     var b = null;
-    var flattenedL = null;
-    var textMask = null;
-    var textSupportMask = null;
-    var textRestoreMask = null;
-    var protectedTextMask = null;
-    var colorMask = null;
-    var protectedColorMask = null;
-    var restoreForegroundMask = new cv.Mat();
-    var protectedForegroundMask = new cv.Mat();
-    var inverseProtectedMask = new cv.Mat();
-    var inverseRestoreMask = new cv.Mat();
-    var backgroundMask = new cv.Mat();
-    var transitionMask = new cv.Mat();
-    var whitenedL = new cv.Mat();
-    var paperLight = null;
-    var neutralA = null;
-    var neutralB = null;
-    var softenedA = new cv.Mat();
-    var softenedB = new cv.Mat();
+    var bgBlurL = new cv.Mat();
+    var l32 = new cv.Mat();
+    var bgBlur32 = new cv.Mat();
+    var normalizedL = new cv.Mat();
+    var paperL = null;
+    var paperA = null;
+    var paperB = null;
+    var blendedL = new cv.Mat();
+    var blendedA = new cv.Mat();
+    var blendedB = new cv.Mat();
     var mergedChannels = new cv.MatVector();
-    var enhancedRgb = new cv.Mat();
-    var finalRgb = new cv.Mat();
-    var foregroundRgb = new cv.Mat();
-    var transitionRgb = new cv.Mat();
-    var paperToneRgb = null;
-    var blurred = new cv.Mat();
+    var mergedLab = new cv.Mat();
+    var resultRgb = new cv.Mat();
     var rgba = new cv.Mat();
-    var paperMask = null;
 
-    cv.cvtColor(resized, rgb, cv.COLOR_RGBA2RGB);
-    cv.cvtColor(rgb, lab, cv.COLOR_RGB2Lab);
-    cv.split(lab, labChannels);
+    try {
+        /* ── MASK PATH ── */
 
-    l = labChannels.get(0);
-    a = labChannels.get(1);
-    b = labChannels.get(2);
-    flattenedL = normalizePaperLighting(l);
-    textMask = createTextMask(flattenedL, settings);
-    textSupportMask = createTextSupportMask(flattenedL, textMask, settings);
-    textRestoreMask = expandMask(
-        textSupportMask,
-        Math.max(3, settings.textRestoreKernel - 2),
-        settings.textRestoreIterations,
-    );
-    protectedTextMask = expandMask(
-        textSupportMask,
-        settings.protectedTextKernel,
-        settings.protectedTextIterations,
-    );
-    colorMask = createColorForegroundMask(rgb, settings);
-    protectedColorMask = expandMask(
-        colorMask,
-        settings.protectedColorKernel,
-        settings.protectedColorIterations,
-    );
-    cv.bitwise_or(textRestoreMask, colorMask, restoreForegroundMask);
-    cv.bitwise_or(protectedTextMask, protectedColorMask, protectedForegroundMask);
-    paperMask = createPaperMask(
-        rgb,
-        flattenedL,
-        settings.paperSaturationLimit,
-        settings.paperLightFloor,
-    );
-    cv.bitwise_not(protectedForegroundMask, inverseProtectedMask);
-    cv.bitwise_and(paperMask, inverseProtectedMask, backgroundMask);
-    cv.bitwise_not(restoreForegroundMask, inverseRestoreMask);
-    cv.bitwise_and(protectedForegroundMask, inverseRestoreMask, transitionMask);
-    paperLight = new cv.Mat(
-        flattenedL.rows,
-        flattenedL.cols,
-        flattenedL.type(),
-        new cv.Scalar(255),
-    );
-    cv.addWeighted(
-        flattenedL,
-        1 - settings.whitenBlend,
-        paperLight,
-        settings.whitenBlend,
-        0,
-        whitenedL,
-    );
-    whitenedL.copyTo(flattenedL, backgroundMask);
-    neutralA = new cv.Mat(a.rows, a.cols, a.type(), new cv.Scalar(128));
-    neutralB = new cv.Mat(b.rows, b.cols, b.type(), new cv.Scalar(128));
-    cv.addWeighted(
-        a,
-        1 - settings.chromaNeutralizeBlend,
-        neutralA,
-        settings.chromaNeutralizeBlend,
-        0,
-        softenedA,
-    );
-    cv.addWeighted(
-        b,
-        1 - settings.chromaNeutralizeBlend,
-        neutralB,
-        settings.chromaNeutralizeBlend,
-        0,
-        softenedB,
-    );
-    softenedA.copyTo(a, backgroundMask);
-    softenedB.copyTo(b, backgroundMask);
+        // Step 1 — Grayscale
+        cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
 
-    mergedChannels.push_back(flattenedL);
-    mergedChannels.push_back(a);
-    mergedChannels.push_back(b);
-    cv.merge(mergedChannels, lab);
+        // Step 2 — Normalize gray to remove shadows/gradients
+        var maskSigma = SCAN_FILTER_MASK_SIGMA > 0
+            ? SCAN_FILTER_MASK_SIGMA
+            : Math.max(18, Math.round(Math.max(gray.cols, gray.rows) * 0.025));
+        cv.GaussianBlur(gray, maskBlur, new cv.Size(0, 0), maskSigma);
+        var maskMeanVal = cv.mean(maskBlur);
+        var maskMean = Math.max(1, maskMeanVal[0]);
+        gray.convertTo(gray32, cv.CV_32F);
+        maskBlur.convertTo(maskBlur32, cv.CV_32F);
+        maskBlur32.convertTo(maskBlur32, -1, 1, 1); // +1 epsilon
+        cv.divide(gray32, maskBlur32, normalizedGray);
+        normalizedGray.convertTo(normalizedGray, cv.CV_8U, maskMean, 0);
 
-    cv.cvtColor(lab, enhancedRgb, cv.COLOR_Lab2RGB);
+        // Step 3 — Otsu on shadow-free normalizedGray
+        cv.threshold(
+            normalizedGray,
+            textMask,
+            0,
+            255,
+            cv.THRESH_BINARY_INV + cv.THRESH_OTSU,
+        );
 
-    cv.addWeighted(
-        rgb,
-        settings.foregroundRestoreBlend,
-        enhancedRgb,
-        1 - settings.foregroundRestoreBlend,
-        0,
-        foregroundRgb,
-    );
-    finalRgb = enhancedRgb.clone();
-    paperToneRgb = new cv.Mat(
-        finalRgb.rows,
-        finalRgb.cols,
-        finalRgb.type(),
-        new cv.Scalar(248, 246, 242, 0),
-    );
-    paperToneRgb.copyTo(finalRgb, backgroundMask);
-    cv.addWeighted(
-        enhancedRgb,
-        1 - settings.transitionPaperBlend,
-        paperToneRgb,
-        settings.transitionPaperBlend,
-        0,
-        transitionRgb,
-    );
-    transitionRgb.copyTo(finalRgb, transitionMask);
-    rgb.copyTo(finalRgb, textRestoreMask);
-    foregroundRgb.copyTo(finalRgb, colorMask);
+        // Step 4 — Dilate text mask → bgMask
+        cv.dilate(textMask, dilatedText, dilateKernel, new cv.Point(-1, -1), 1);
+        cv.bitwise_not(dilatedText, bgMask);
 
-    // Unsharp mask keeps text edges crisp after denoising.
-    cv.GaussianBlur(finalRgb, blurred, new cv.Size(0, 0), settings.sharpenSigma);
-    cv.addWeighted(
-        finalRgb,
-        1 + settings.sharpenAmount,
-        blurred,
-        -settings.sharpenAmount,
-        0,
-        finalRgb,
-    );
-    clampMat(finalRgb);
+        /* ── OUTPUT PATH (operates on original src, never on normalizedGray) ── */
 
-    cv.cvtColor(finalRgb, rgba, cv.COLOR_RGB2RGBA);
+        // Convert original to Lab
+        cv.cvtColor(src, rgb, cv.COLOR_RGBA2RGB);
+        cv.cvtColor(rgb, lab, cv.COLOR_RGB2Lab);
+        cv.split(lab, labChannels);
 
-    resized.delete();
-    rgb.delete();
-    lab.delete();
-    labChannels.delete();
-    if (l) l.delete();
-    if (a) a.delete();
-    if (b) b.delete();
-    if (flattenedL) flattenedL.delete();
-    if (textMask) textMask.delete();
-    if (textSupportMask) textSupportMask.delete();
-    if (textRestoreMask) textRestoreMask.delete();
-    if (protectedTextMask) protectedTextMask.delete();
-    if (colorMask) colorMask.delete();
-    if (protectedColorMask) protectedColorMask.delete();
-    restoreForegroundMask.delete();
-    protectedForegroundMask.delete();
-    inverseProtectedMask.delete();
-    inverseRestoreMask.delete();
-    backgroundMask.delete();
-    transitionMask.delete();
-    whitenedL.delete();
-    if (paperLight) paperLight.delete();
-    if (neutralA) neutralA.delete();
-    if (neutralB) neutralB.delete();
-    softenedA.delete();
-    softenedB.delete();
-    mergedChannels.delete();
-    enhancedRgb.delete();
-    finalRgb.delete();
-    foregroundRgb.delete();
-    transitionRgb.delete();
-    blurred.delete();
-    if (paperToneRgb) paperToneRgb.delete();
-    if (paperMask) paperMask.delete();
+        l = labChannels.get(0);
+        a = labChannels.get(1);
+        b = labChannels.get(2);
 
-    return rgba;
+        // Step 5a — Soft normalize lighting on background L only
+        var bgSigma = SCAN_FILTER_BG_NORMALIZE_SIGMA > 0
+            ? SCAN_FILTER_BG_NORMALIZE_SIGMA
+            : Math.max(18, Math.round(Math.max(l.cols, l.rows) * 0.025));
+        cv.GaussianBlur(l, bgBlurL, new cv.Size(0, 0), bgSigma);
+        var bgMeanVal = cv.mean(bgBlurL, bgMask);
+        var bgMean = Math.max(1, bgMeanVal[0]);
+        l.convertTo(l32, cv.CV_32F);
+        bgBlurL.convertTo(bgBlur32, cv.CV_32F);
+        bgBlur32.convertTo(bgBlur32, -1, 1, 1);
+        cv.divide(l32, bgBlur32, normalizedL);
+        normalizedL.convertTo(normalizedL, cv.CV_8U, bgMean, 0);
+        normalizedL.copyTo(l, bgMask);
+
+        // Step 5b — Blend background Lab toward PAPER_COLOR
+        _ensurePaperLab();
+        paperL = new cv.Mat(l.rows, l.cols, l.type(), new cv.Scalar(PAPER_LAB_L));
+        paperA = new cv.Mat(a.rows, a.cols, a.type(), new cv.Scalar(PAPER_LAB_A));
+        paperB = new cv.Mat(b.rows, b.cols, b.type(), new cv.Scalar(PAPER_LAB_B));
+
+        cv.addWeighted(l, 1 - SCAN_FILTER_BLEND_ALPHA, paperL, SCAN_FILTER_BLEND_ALPHA, 0, blendedL);
+        cv.addWeighted(a, 1 - SCAN_FILTER_BLEND_ALPHA, paperA, SCAN_FILTER_BLEND_ALPHA, 0, blendedA);
+        cv.addWeighted(b, 1 - SCAN_FILTER_BLEND_ALPHA, paperB, SCAN_FILTER_BLEND_ALPHA, 0, blendedB);
+
+        blendedL.copyTo(l, bgMask);
+        blendedA.copyTo(a, bgMask);
+        blendedB.copyTo(b, bgMask);
+
+        // Step 6 — Merge Lab → RGB, restore text, output RGBA
+        mergedChannels.push_back(l);
+        mergedChannels.push_back(a);
+        mergedChannels.push_back(b);
+        cv.merge(mergedChannels, mergedLab);
+        cv.cvtColor(mergedLab, resultRgb, cv.COLOR_Lab2RGB);
+
+        // Restore original pixels where text lives
+        var origRgb = new cv.Mat();
+        cv.cvtColor(src, origRgb, cv.COLOR_RGBA2RGB);
+        origRgb.copyTo(resultRgb, dilatedText);
+        origRgb.delete();
+
+        cv.cvtColor(resultRgb, rgba, cv.COLOR_RGB2RGBA);
+
+        return rgba;
+    } finally {
+        // Mask path cleanup
+        gray.delete();
+        maskBlur.delete();
+        gray32.delete();
+        maskBlur32.delete();
+        normalizedGray.delete();
+        textMask.delete();
+        dilatedText.delete();
+        bgMask.delete();
+        dilateKernel.delete();
+        // Output path cleanup
+        rgb.delete();
+        lab.delete();
+        labChannels.delete();
+        if (l) l.delete();
+        if (a) a.delete();
+        if (b) b.delete();
+        bgBlurL.delete();
+        l32.delete();
+        bgBlur32.delete();
+        normalizedL.delete();
+        if (paperL) paperL.delete();
+        if (paperA) paperA.delete();
+        if (paperB) paperB.delete();
+        blendedL.delete();
+        blendedA.delete();
+        blendedB.delete();
+        mergedChannels.delete();
+        mergedLab.delete();
+        resultRgb.delete();
+        // rgba is returned — caller deletes it
+    }
 }
 
 /* ══════════════════════════════════════════
@@ -2419,7 +2027,13 @@ function detectDocument(src, options) {
     }
 }
 
-function warpDocument(src, pts, options) {
+/**
+ * Apply only the perspective transform.
+ * Separated from warpDocument so the debug pipeline can capture the
+ * intermediate warped image before refine/upscale run.
+ * Caller owns the returned Mat.
+ */
+function warpPerspective(src, pts) {
     var ordered = orderPoints(pts);
     var topLeft = ordered[0];
     var topRight = ordered[1];
@@ -2469,6 +2083,11 @@ function warpDocument(src, pts, options) {
     dstMat.delete();
     matrix.delete();
 
+    return warped;
+}
+
+function warpDocument(src, pts, options) {
+    var warped = warpPerspective(src, pts);
     var refined = refineWarpedCrop(warped, options.assumeCenteredDocument);
     warped.delete();
     var upscaled = upscaleAfterWarp(refined);
@@ -2612,4 +2231,5 @@ self.onmessage = function (e) {
         }
         return;
     }
+
 };

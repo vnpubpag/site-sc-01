@@ -2153,6 +2153,16 @@ function processImage(imageData, options, manualCorners) {
             debugLog("processImage: fallback to original image");
         }
 
+        if (options.skipScanFilter) {
+            var result = new ImageData(
+                new Uint8ClampedArray(src.data),
+                src.cols,
+                src.rows,
+            );
+            src.delete();
+            return result;
+        }
+
         var dst = applyScanFilter(src);
         src.delete();
 

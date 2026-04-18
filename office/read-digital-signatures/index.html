@@ -1,0 +1,317 @@
+<!DOCTYPE html><html lang="vi"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>
+            Đọc chữ ký số trong file | Chitiet.vn
+        </title><meta name="description" content="Chitiet.vn cung cấp công cụ  trực tuyến & hướng dẫn chi tiết giúp tiết kiệm thời gian. Chạy hoàn toàn trên trình duyệt, không upload dữ liệu lên server. Đảm bảo bảo mật và riêng tư cho người dùng."><meta name="robots" content="index, follow"><link rel="canonical" href="https://chitiet.vn/office/read-digital-signatures/"><meta property="og:title" content="Chitiet.vn - Công cụ trực tuyến miễn phí"><meta property="og:description" content="Công cụ trực tuyến miễn phí và hướng dẫn chi tiết, nhanh, an toàn và tiện lợi cho người dùng."><meta property="og:image" content="https://chitiet.vn/og-image.jpg"><meta property="og:type" content="website"><meta property="og:url" content="https://chitiet.vn/office/read-digital-signatures/"><meta property="og:site_name" content="Chitiet.vn"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><link rel="icon" type="image/png" href="/logo.png"><link rel="icon" href="/favicon.ico"><!-- Prevent FOUC --><script>
+            (function() {
+                var t = localStorage.getItem('chitiet-theme');
+                if (t) document.documentElement.setAttribute('data-theme', t);
+            })();
+        </script><script type="application/ld+json">
+        {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Công cụ trực tuyến miễn phí",
+            "applicationCategory": "UtilitiesApplication",
+            "operatingSystem": "Web Browser",
+            "url": canonical,
+            "description": "Công cụ trực tuyến miễn phí, chạy trực tiếp trên trình duyệt, không lưu trữ dữ liệu.",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "VND"
+            }
+        })}
+        </script><link rel="stylesheet" href="/_astro/read-digital-signatures@_@astro.B96Rn9AB.css">
+<style>.rating-wrapper[data-astro-cid-utcr2s3b]{display:inline-flex;flex-direction:column;gap:6px}.stars[data-astro-cid-utcr2s3b]{display:flex;gap:6px}.star[data-astro-cid-utcr2s3b]{background:none;border:none;font-size:28px;cursor:pointer;color:#ccc;transition:transform .1s ease,color .2s ease}.star[data-astro-cid-utcr2s3b]:hover{transform:scale(1.15)}.star[data-astro-cid-utcr2s3b].active,.star[data-astro-cid-utcr2s3b].hovered{color:#f5b301}.rating-text[data-astro-cid-utcr2s3b]{font-size:14px;color:#666}
+</style>
+<link rel="stylesheet" href="/_astro/themes.Co3nGf25.css"></head> <body> <div class="page-wrapper"> <header class="site-header" data-pagefind-ignore> <div class="site-header__inner"> <a href="/" class="site-header__brand" style="text-decoration:none"> <div class="rubik-scene"> <div class="rubik-wrap" aria-hidden="true" data-rubik></div> </div> <script type="module">const o={1:"var(--ct-logo-1)",2:"var(--ct-logo-2)",3:"var(--ct-logo-3)",4:"var(--ct-logo-4)",5:"var(--ct-logo-5)",6:"var(--ct-logo-6)",7:"var(--ct-logo-7)",8:"var(--ct-logo-8)",9:"var(--ct-logo-9)"},u=[{type:"row",idx:0,dir:-1},{type:"col",idx:2,dir:-1},{type:"row",idx:2,dir:1},{type:"col",idx:0,dir:1},{type:"row",idx:1,dir:-1},{type:"col",idx:1,dir:-1}];class m{el;state;cells=[];moveIdx=0;busy=!1;paused=!1;timer=0;constructor(t){this.el=t,this.state=[[1,2,3],[4,5,6],[7,8,9]],this.buildCells(),this.bindHover(),this.bindMotion(),this.schedule()}buildCells(){for(let t=0;t<3;t++){this.cells[t]=[];for(let e=0;e<3;e++){const n=document.createElement("span");n.className="rubik-cell",Object.assign(n.style,{position:"absolute",width:"9px",height:"9px",left:e*10+"px",top:t*10+"px",background:o[this.state[t][e]]}),this.el.appendChild(n),this.cells[t][e]=n}}}bindHover(){const t=this.el.closest(".site-header__brand, .site-footer__brand");t&&(t.addEventListener("mouseenter",()=>this.paused=!0),t.addEventListener("mouseleave",()=>{this.paused=!1,this.busy||this.schedule()}))}bindMotion(){const t=window.matchMedia("(prefers-reduced-motion: reduce)");t.matches&&(this.paused=!0),t.addEventListener("change",e=>{this.paused=e.matches,!e.matches&&!this.busy&&this.schedule()})}schedule(){clearTimeout(this.timer),this.timer=window.setTimeout(()=>{this.paused||this.doMove()},1400)}doMove(){if(this.busy||this.paused)return;this.busy=!0;const t=u[this.moveIdx%u.length];this.moveIdx++,t.type==="row"?this.animRow(t.idx,t.dir):this.animCol(t.idx,t.dir)}makeGhost(t){const e=document.createElement("span");return e.className="rubik-cell",Object.assign(e.style,{position:"absolute",width:"9px",height:"9px",background:t}),e}animRow(t,e){const n=[0,1,2].map(i=>this.state[t][i]),l=e*10,a=this.makeGhost(o[e===-1?n[0]:n[2]]);a.style.top=t*10+"px",a.style.left=(e===-1?30:-10)+"px",this.el.appendChild(a);const h=[a,...this.cells[t]];requestAnimationFrame(()=>{h.forEach(i=>i.style.transition="transform 350ms cubic-bezier(.4,0,.2,1)"),requestAnimationFrame(()=>{h.forEach(i=>i.style.transform=`translateX(${l}px)`),setTimeout(()=>{if(e===-1){const i=this.state[t].shift();this.state[t].push(i)}else{const i=this.state[t].pop();this.state[t].unshift(i)}for(let i=0;i<3;i++){const s=this.cells[t][i];s.style.transition="none",s.style.transform="none",s.style.background=o[this.state[t][i]]}a.remove(),this.busy=!1,this.schedule()},366)})})}animCol(t,e){const n=[0,1,2].map(s=>this.state[s][t]),l=e*10,a=this.makeGhost(o[e===-1?n[0]:n[2]]);a.style.left=t*10+"px",a.style.top=(e===-1?30:-10)+"px",this.el.appendChild(a);const h=[0,1,2].map(s=>this.cells[s][t]),i=[a,...h];requestAnimationFrame(()=>{i.forEach(s=>s.style.transition="transform 350ms cubic-bezier(.4,0,.2,1)"),requestAnimationFrame(()=>{i.forEach(s=>s.style.transform=`translateY(${l}px)`),setTimeout(()=>{if(e===-1){const s=this.state[0][t];this.state[0][t]=this.state[1][t],this.state[1][t]=this.state[2][t],this.state[2][t]=s}else{const s=this.state[2][t];this.state[2][t]=this.state[1][t],this.state[1][t]=this.state[0][t],this.state[0][t]=s}for(let s=0;s<3;s++){const d=this.cells[s][t];d.style.transition="none",d.style.transform="none",d.style.background=o[this.state[s][t]]}a.remove(),this.busy=!1,this.schedule()},366)})})}}function c(){document.querySelectorAll("[data-rubik]").forEach(r=>{r.dataset.rubikInit||(r.dataset.rubikInit="true",new m(r))})}document.addEventListener("astro:page-load",c);document.readyState==="loading"?document.addEventListener("DOMContentLoaded",c):c();</script> <div class="brand-name">chitiet.vn</div> </a> <nav class="site-nav" aria-label="Breadcrumb"> <a href="/" class="site-nav__link">Trang chủ</a> </nav> <div class="site-header__actions"> <div class="site-header__island"> <div class="theme-switcher" role="group" aria-label="Theme switcher"> <button class="theme-switcher__btn" data-theme="default" title="Default theme" aria-label="Default theme"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg></button> <button class="theme-switcher__btn" data-theme="dark" title="Dark theme" aria-label="Dark theme"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button> <button class="theme-switcher__btn" data-theme="glass" title="Modern theme" aria-label="Modern theme"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></button> </div> <script type="module">document.addEventListener("DOMContentLoaded",()=>{document.querySelectorAll(".theme-switcher__btn").forEach(t=>{t.addEventListener("click",()=>{const e=t.dataset.theme;e&&(e==="default"?(document.documentElement.removeAttribute("data-theme"),localStorage.removeItem("chitiet-theme")):(document.documentElement.setAttribute("data-theme",e),localStorage.setItem("chitiet-theme",e)))})})});</script> </div> </div> </div> </header> <main class="content-main" data-pagefind-body> <div class="content-main__layout" style> <div class="content-main__inner" data-pagefind-meta="group:office">   <div class="sigx-hero" data-pagefind-weight="10"> <div class="sigx-hero__heading"> <h1 class="sigx-hero__title">Đọc chữ ký số trong file</h1> <div class="sigx-privacy-wrap"> <button class="sigx-privacy-trigger" id="sigx-privacy-trigger" type="button" aria-label="Thông tin bảo mật" aria-expanded="false" aria-controls="sigx-privacy-popover"> <img src="/images/protect.png" alt="Bảo mật" width="30" height="30"> </button> <div class="sigx-privacy-popover" id="sigx-privacy-popover" role="tooltip"> <div class="sigx-privacy-popover__arrow"></div> <p class="sigx-privacy-popover__title">
+Bảo mật là ưu tiên
+</p> <p class="sigx-privacy-popover__desc">
+🔒 Xử lý trực tiếp trên trình duyệt – không lưu dữ liệu,
+                        không gửi file ra máy chủ.
+</p> </div> </div> </div> <p class="sigx-hero__subtitle">
+Đọc và kiểm tra chữ ký số trong file PDF & XML. Hỗ trợ nhiều file,
+            xử lý hoàn toàn trên trình duyệt.
+</p> </div>  <div class="sigx-guide" role="note"> <p class="sigx-guide__item">
+📌 <strong>Với hóa đơn điện tử:</strong> chữ ký số thường nằm trong file
+<strong>XML</strong>, PDF chỉ là bản hiển thị.
+</p> <p class="sigx-guide__item">
+📌 <strong>Với hợp đồng điện tử:</strong> chữ ký thường nằm trong file
+<strong>PDF</strong>.
+</p> <p class="sigx-guide__item">
+⚠️ Trình duyệt không có trust store CA gốc. Xác minh chỉ dựa trên
+            kiểm tra kỹ thuật.
+</p> </div>  <div class="sigx-upload" id="sigx-dropzone"> <input type="file" id="sigx-file-input" accept="application/pdf,application/xml,text/xml,.pdf,.xml" multiple hidden> <div class="sigx-upload__icon" aria-hidden="true"> <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"> <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path> <polyline points="17 8 12 3 7 8"></polyline> <line x1="12" y1="3" x2="12" y2="15"></line> </svg> </div> <div class="sigx-upload__content"> <p class="sigx-upload__text">
+Kéo thả PDF hoặc XML vào đây (chọn nhiều file)
+</p> <p class="sigx-upload__hint">
+Hỗ trợ PDF & XML, tối đa 100 MB mỗi file.
+</p> </div> <button class="btn btn--secondary" id="sigx-select-btn" type="button"> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"> <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path> <polyline points="14 2 14 8 20 8"></polyline> </svg>
+Chọn file
+</button> </div>  <div id="sigx-workspace" style="display:none"> <!-- Queue (pre-analysis) --> <section class="sigx-queue" aria-label="Danh sách file đã chọn"> <header class="sigx-queue__header"> <h2 class="sigx-queue__title">File đã chọn</h2> <span class="sigx-queue__count badge badge--default" id="sigx-queue-count">0 file</span> </header> <ol class="sigx-queue__list" id="sigx-queue-list"></ol> <div class="sigx-queue__actions"> <button class="btn btn--secondary sigx-queue__add" type="button">
++ Thêm file
+</button> <button class="btn btn--ghost" id="sigx-clear" type="button">
+Xoá tất cả
+</button> </div> </section> <!-- Read action --> <div class="sigx-read" id="sigx-read"> <p class="sigx-read__status" id="sigx-read-status" data-state="">
+Chọn file rồi bấm Đọc chữ ký
+</p> <button class="btn btn--primary" id="sigx-read-btn" type="button" disabled> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"> <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path> <polyline points="9 12 11 14 15 10"></polyline> </svg>
+Đọc chữ ký
+</button> </div> <!-- Empty results --> <div class="sigx-empty" id="sigx-empty" style="display:none"> <div class="sigx-empty__icon" aria-hidden="true"> <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"> <circle cx="12" cy="12" r="10"></circle> <line x1="12" y1="8" x2="12" y2="12"></line> <line x1="12" y1="16" x2="12.01" y2="16"></line> </svg> </div> <p class="sigx-empty__title">Chưa có chữ ký nào được phát hiện</p> <p class="sigx-empty__desc">
+Hãy chắc chắn file đã được ký số. Với hoá đơn điện tử, hãy thêm
+                cả XML đi kèm.
+</p> </div> <!-- Results: 2 panels --> <section class="sigx-results" id="sigx-results" style="display:none" aria-label="Kết quả phân tích chữ ký"> <header class="sigx-results__header"> <h2 class="sigx-results__title">Kết quả</h2> <span class="sigx-results__summary badge badge--default" id="sigx-summary">—</span> </header> <div class="sigx-results__body" id="sigx-results-body" data-view="list"> <!-- Left: file list --> <aside class="sigx-results__files" aria-label="Danh sách file"> <ol class="sigx-file-list" id="sigx-file-list"></ol> </aside> <!-- Right: signatures accordion --> <div class="sigx-results__signatures" id="sigx-sig-panel" aria-label="Chữ ký trong file đã chọn"> <div class="sigx-sig-panel__head" id="sigx-sig-header"> <button class="sigx-sig-panel__back" id="sigx-sig-back" type="button" aria-label="Quay lại danh sách file"> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"> <polyline points="15 18 9 12 15 6"></polyline> </svg> </button> <div class="sigx-sig-panel__meta"> <p class="sigx-sig-panel__name" id="sigx-sig-header-name">
+—
+</p> <p class="sigx-sig-panel__sub" id="sigx-sig-header-meta">
+—
+</p> </div> </div> <div class="sigx-sig-panel__empty" id="sigx-sig-empty" style="display:none">
+Chọn một file để xem chữ ký.
+</div> <ol class="sigx-sig-panel__list" id="sigx-sig-list"></ol> </div> </div> </section> </div>  <section class="sigx-info" data-pagefind-ignore> <h2 class="sigx-info__title">Giới thiệu công cụ</h2> <p class="sigx-info__text">
+Công cụ đọc và kiểm tra chữ ký số trong file PDF và XML ngay trên
+            trình duyệt. Có thể đọc nhiều file cùng lúc.
+</p> <div class="sigx-features"> <div class="sigx-feature"> <div class="sigx-feature__icon" aria-hidden="true"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path> </svg> </div> <h3 class="sigx-feature__title">PDF & XML</h3> <p class="sigx-feature__desc">
+Tự động phát hiện định dạng và đọc chữ ký phù hợp cho từng
+                    loại file.
+</p> </div> <div class="sigx-feature"> <div class="sigx-feature__icon" aria-hidden="true"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect> <path d="M7 11V7a5 5 0 0 1 10 0v4"></path> </svg> </div> <h3 class="sigx-feature__title">Riêng tư tuyệt đối</h3> <p class="sigx-feature__desc">
+File không rời khỏi thiết bị. Không được đẩy lên máy chủ từ
+                    xa hay lưu trữ trên đám mây.
+</p> </div> <div class="sigx-feature"> <div class="sigx-feature__icon" aria-hidden="true"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path> <polyline points="14 2 14 8 20 8"></polyline> </svg> </div> <h3 class="sigx-feature__title">Nhiều chữ ký</h3> <p class="sigx-feature__desc">
+Liệt kê tất cả chữ ký trong file.
+</p> </div> </div> <div class="sigx-howto"> <h3 class="sigx-howto__title">Cách sử dụng</h3> <div class="sigx-steps"> <div class="sigx-step"> <div class="sigx-step__number" aria-hidden="true">1</div> <div class="sigx-step__content"> <p class="sigx-step__label">Chọn file PDF hoặc XML</p> <p class="sigx-step__desc">
+Kéo thả hoặc bấm "Chọn file" để thêm một hoặc nhiều
+                            file. Có thể thêm lẫn lộn PDF và XML.
+</p> </div> </div> <div class="sigx-step"> <div class="sigx-step__number" aria-hidden="true">2</div> <div class="sigx-step__content"> <p class="sigx-step__label">Tự động phân tích</p> <p class="sigx-step__desc">
+Ngay khi thêm file, công cụ tự động phát hiện định
+                            dạng, đọc chữ ký và giải mã chứng thư số.
+</p> </div> </div> <div class="sigx-step"> <div class="sigx-step__number" aria-hidden="true">3</div> <div class="sigx-step__content"> <p class="sigx-step__label">Xem chi tiết</p> <p class="sigx-step__desc">
+Chọn file ở panel trái, bấm vào từng chữ ký ở panel
+                            phải để mở rộng và xem đầy đủ certificate chain.
+</p> </div> </div> </div> </div> <div class="sigx-faq"> <h3 class="sigx-faq__title">Câu hỏi thường gặp</h3> <div class="sigx-faq__list"> <details class="sigx-faq__item"> <summary class="sigx-faq__question">Vì sao trạng thái XML thường là "Không xác định"?</summary> <p class="sigx-faq__answer">
+Để xác minh tuyệt đối chữ ký cần thực hiện nhiều bước
+                        phức tạp. Công cụ tập trung vào việc đọc thông tin người
+                        ký, tổ chức cấp và hiệu lực chứng thư thay vì xác minh
+                        chữ ký đầy đủ.
+</p> </details> <details class="sigx-faq__item"> <summary class="sigx-faq__question">Hoá đơn điện tử có chữ ký ở PDF hay XML?</summary> <p class="sigx-faq__answer">
+Với hoá đơn điện tử Việt Nam, chữ ký số hợp pháp nằm
+                        trong XML (theo chuẩn của Tổng cục Thuế). File PDF là
+                        bản hiển thị cho người đọc, thường không có chữ ký số.
+</p> </details> <details class="sigx-faq__item"> <summary class="sigx-faq__question">File có được upload lên server không?</summary> <p class="sigx-faq__answer">
+Không. Tất cả phân tích diễn ra trên trình duyệt, file
+                        không bao giờ rời khỏi thiết bị.
+</p> </details> <details class="sigx-faq__item"> <summary class="sigx-faq__question">Giới hạn kích thước?</summary> <p class="sigx-faq__answer">
+Tối đa 100 MB mỗi file, tối đa 20 file một lần.
+</p> </details> </div> </div> </section>  </div> <aside class="content-sidebar content-sidebar--right"> <div class="content-sidebar__sticky"> <div class="related-tools"> <div class="related-tools__label">Khám phá thêm</div> <nav class="related-tools__list"> <a href="/office/extract-images-from-pdf/" class="related-tools__item"> Tách ảnh từ PDF </a><a href="/office/quick-share/" class="related-tools__item"> Chia sẻ nhanh giữa hai máy </a><a href="/office/pdf-to-docx/" class="related-tools__item"> Chuyển PDF sang Word (DOCX) </a><a href="/office/compress-image/" class="related-tools__item"> Nén ảnh tối ưu </a><a href="/office/image-to-pdf/" class="related-tools__item"> Chuyển ảnh thành PDF </a> </nav> </div> <div class="rating-box"> <p class="rating-box__label">
+Bạn có thích công cụ này?
+</p> <div id="rating-wrapper" class="rating-wrapper" data-slug="read-digital-signatures" data-title="Đọc chữ ký số trong file" data-type="office" data-allow-update="true" data-astro-cid-utcr2s3b> <div class="stars" role="radiogroup" aria-label="Rating" data-astro-cid-utcr2s3b> <button class="star" data-value="1" role="radio" aria-checked="false" aria-label="Rate 1 stars" data-astro-cid-utcr2s3b>
+★
+</button><button class="star" data-value="2" role="radio" aria-checked="false" aria-label="Rate 2 stars" data-astro-cid-utcr2s3b>
+★
+</button><button class="star" data-value="3" role="radio" aria-checked="false" aria-label="Rate 3 stars" data-astro-cid-utcr2s3b>
+★
+</button><button class="star" data-value="4" role="radio" aria-checked="false" aria-label="Rate 4 stars" data-astro-cid-utcr2s3b>
+★
+</button><button class="star" data-value="5" role="radio" aria-checked="false" aria-label="Rate 5 stars" data-astro-cid-utcr2s3b>
+★
+</button> </div> <div class="rating-text" data-astro-cid-utcr2s3b></div> </div>  <script type="module">
+    function createRating(wrapper) {
+        const stars = wrapper.querySelectorAll(".star");
+        const text = wrapper.querySelector(".rating-text");
+
+        if (!stars.length || !text) return;
+
+        const { slug, title, type } = wrapper.dataset;
+
+        let selectedValue = null;
+        let sent = false;
+
+        function highlight(ratingValue) {
+            stars.forEach((star) => {
+                const value = Number(star.dataset.value);
+                star.classList.toggle(
+                    "active",
+                    selectedValue !== null && value <= selectedValue,
+                );
+                star.classList.toggle(
+                    "hovered",
+                    selectedValue === null && value <= ratingValue,
+                );
+            });
+        }
+
+        function sendToGA(value) {
+            if (typeof window.gtag !== "function") return;
+
+            if (!slug) {
+                return console.warn(
+                    "Content slug is missing. Rating event will not be sent to GA.",
+                );
+            }
+
+            window.gtag("event", "rate_content", {
+                rating_value: value,
+                content_slug: slug,
+                content_title: title,
+                content_type: type,
+                method: "stars",
+            });
+        }
+
+        stars.forEach((star) => {
+            const value = Number(star.dataset.value);
+
+            star.addEventListener("mouseenter", () => {
+                if (selectedValue === null) highlight(value);
+            });
+
+            star.addEventListener("mouseleave", () => {
+                highlight(0);
+            });
+
+            star.addEventListener("click", () => {
+                if (sent) return;
+
+                selectedValue = value;
+                highlight(value);
+                text.textContent = `Bạn đã đánh giá ${value}/5`;
+
+                sendToGA(value);
+                sent = true;
+            });
+        });
+    }
+
+    function initRating() {
+        let wrapper = document.getElementById("rating-wrapper");
+
+        if (!wrapper) throw new Error("Rating wrapper not found");
+
+        createRating(wrapper);
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initRating);
+    } else {
+        initRating();
+    }
+</script> </div> </div> </aside> </div> </main> <section class="feature-cta" data-pagefind-ignore aria-labelledby="feature-cta-title"> <div class="feature-cta__inner"> <h2 id="feature-cta-title" class="feature-cta__title">
+Bạn có ý tưởng nào muốn chúng tôi thực hiện?
+</h2> <p class="feature-cta__subtext">
+Chúng tôi ưu tiên ý tưởng từ người dùng. Ý tưởng hay có thể được
+            triển khai nhanh chóng.
+</p> <button type="button" class="feature-cta__button" onclick="window.openFeatureRequestModal && window.openFeatureRequestModal()"> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"> <path d="M9 18h6"></path> <path d="M10 22h4"></path> <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5C8.26 12.26 8.72 13.02 8.91 14"></path> </svg>
+Gửi ý tưởng
+</button> </div> </section> <footer class="site-footer" data-pagefind-ignore> <div class="site-footer__inner"> <div class="site-footer__columns"> <div class="site-footer__col"> <a href="/" class="site-footer__brand" aria-label="Trang chủ chitiet.vn"> <div class="rubik-scene rubik-scene--sm"> <div class="rubik-wrap" aria-hidden="true" data-rubik></div> </div>  <span class="site-footer__brand-name">chitiet.vn</span> </a> <p class="site-footer__tagline">
+Công cụ trực tuyến miễn phí và hướng dẫn chi tiết, nhanh và
+                    an toàn ngay trong trình duyệt của bạn.
+</p> </div> <div class="site-footer__col"> <h3 class="site-footer__col-title">Sản phẩm</h3> <ul class="site-footer__links"> <li> <a class="site-footer__link" href="/#section-office">Công cụ văn phòng</a> </li> <li> <a class="site-footer__link" href="/#section-tools">Công cụ tiện ích</a> </li> <li> <a class="site-footer__link" href="/#section-fun">Giáo dục và Giải trí</a> </li> <li> <a class="site-footer__link" href="/#section-guide">Hướng dẫn chi tiết</a> </li> </ul> </div> <div class="site-footer__col"> <h3 class="site-footer__col-title">Hỗ trợ</h3> <ul class="site-footer__links"> <li> <a class="site-footer__link" href="mailto:hello@chitiet.vn">Liên hệ</a> </li> <li> <button type="button" class="site-footer__link" onclick="window.openFeatureRequestModal && window.openFeatureRequestModal()">
+Gửi ý tưởng
+</button> </li> <li> <a class="site-footer__link" href="/privacy/">Chính sách</a> </li> </ul> </div> <div class="site-footer__col"> <h3 class="site-footer__col-title">Xã hội</h3> <ul class="site-footer__links"> <li> <a class="site-footer__link" href="#" rel="noopener">Facebook</a> </li> <li> <a class="site-footer__link" href="#" rel="noopener">Twitter</a> </li> </ul> </div> </div> <div class="site-footer__bottom"> <div class="site-footer__disclaimer-group"> <h4 class="site-footer__disclaimer-title">
+Miễn trừ trách nhiệm
+</h4> <p class="site-footer__disclaimer">
+Các công cụ và nội dung trên website chỉ nhằm mục đích hỗ
+                    trợ và tham khảo. Người dùng tự chịu trách nhiệm đối với
+                    việc sử dụng mọi kết quả (dữ liệu, file, nội dung) được tạo
+                    ra.
+</p> </div> <p class="site-footer__copyright">
+© 2026 chitiet.vn. All rights reserved.
+</p> </div> </div> </footer> </div> <button type="button" class="rive-trigger-btn" id="rive-trigger-btn" title="Xem animation"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z" fill="currentColor"></path><path d="M19 14l.9 2.1L22 17l-2.1.9L19 20l-.9-2.1L16 17l2.1-.9L19 14z" fill="currentColor"></path><path d="M5 17l.6 1.4L7 19l-1.4.6L5 21l-.6-1.4L3 19l1.4-.6L5 17z" fill="currentColor"></path></svg></button><div class="rive-picker" id="rive-picker" aria-hidden="true"><div class="rive-picker__header"><span class="rive-picker__title">Chọn animation</span><button class="rive-picker__close" id="rive-picker-close" aria-label="Đóng"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><div class="rive-picker__list"><button class="rive-picker__item" data-file="/animations/12335-23415-robocat-expressive-faces-interactive-fun.riv" data-name="Robocat Expressive Faces Interactive Fun"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>Robocat Expressive Faces Interactive Fun</span></button><button class="rive-picker__item" data-file="/animations/18475-34717-shake-it-duo.riv" data-name="Shake It Duo"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>Shake It Duo</span></button><button class="rive-picker__item" data-file="/animations/186-341-flame-and-spark.riv" data-name="Flame And Spark"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>Flame And Spark</span></button><button class="rive-picker__item" data-file="/animations/19564-46763-grab-a-coffee.riv" data-name="Grab A Coffee"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>Grab A Coffee</span></button><button class="rive-picker__item" data-file="/animations/20670-38901-thurtdeath.riv" data-name="Thurtdeath"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>Thurtdeath</span></button><button class="rive-picker__item" data-file="/animations/3469-7899-login-screen-character.riv" data-name="Login Screen Character"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>Login Screen Character</span></button><button class="rive-picker__item" data-file="/animations/4458-9102-the-dog-barber.riv" data-name="The Dog Barber"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>The Dog Barber</span></button><button class="rive-picker__item" data-file="/animations/528-1006-toilet-paper-loader.riv" data-name="Toilet Paper Loader"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>Toilet Paper Loader</span></button><button class="rive-picker__item" data-file="/animations/5317-10579-hero-animation-use-case.riv" data-name="Hero Animation Use Case"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>Hero Animation Use Case</span></button><button class="rive-picker__item" data-file="/animations/798-1554-tree-demo.riv" data-name="Tree Demo"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>Tree Demo</span></button><button class="rive-picker__item" data-file="/animations/9330-17748-star-face.riv" data-name="Star Face"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>Star Face</span></button><button class="rive-picker__item" data-file="/animations/9625-18398-pro-five-star-review.riv" data-name="Pro Five Star Review"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>Pro Five Star Review</span></button><button class="rive-picker__item" data-file="/animations/9939-18941-big-wheel-demo.riv" data-name="Big Wheel Demo"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>Big Wheel Demo</span></button></div></div><div class="rive-player-overlay" id="rive-player-overlay" aria-hidden="true"><div class="rive-player-overlay__bg"></div><div class="rive-player"><button class="rive-player__exit" id="rive-player-exit" aria-label="Đóng"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button><div class="rive-player__actions" id="rive-player-actions"></div><div class="rive-player__stage"><canvas id="rive-canvas" width="800" height="600"></canvas></div><div class="rive-player__label" id="rive-player-label"></div></div></div><script type="module" src="/_astro/RivePlayerWidget.astro_astro_type_script_index_0_lang.CiNsopjn.js"></script> <!-- Modal Backdrop --><div id="fr-modal-overlay" class="fr-overlay" aria-hidden="true"> <div class="fr-backdrop"></div> <!-- Modal --> <div class="fr-modal" role="dialog" aria-modal="true" aria-labelledby="fr-title"> <!-- Header --> <div class="fr-modal__header"> <div class="fr-modal__title-group"> <div class="fr-modal__icon"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M9 18h6"></path><path d="M10 22h4"></path> <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5C8.26 12.26 8.72 13.02 8.91 14"></path> </svg> </div> <h2 id="fr-title" class="fr-modal__title">
+Đề xuất tính năng mới
+</h2> </div> <button id="fr-close-btn" class="fr-modal__close" aria-label="Đóng"> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line> </svg> </button> </div> <!-- Body --> <div class="fr-modal__body"> <!-- Info box --> <div class="fr-info-box"> <svg class="fr-info-box__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line> </svg> <p class="fr-info-box__text">
+Chúng tôi luôn muốn biết mọi ý tưởng/nhu cầu của bạn, hãy cứ
+                    chia sẻ, biết đâu chúng tôi có thể hoàn thành nó nhanh hơn
+                    bạn mong đợi!
+</p> </div> <form id="featureForm" class="fr-form"> <input type="text" name="website" style="display:none"> <div class="fr-field"> <label class="fr-label" for="fr-name">Tên tính năng</label> <input id="fr-name" class="fr-input" type="text" name="featureName" placeholder="Ví dụ: Chế độ Dark mode, Tự động sao lưu..." required> </div> <div class="fr-field"> <label class="fr-label" for="fr-desc">Mô tả chi tiết</label> <textarea id="fr-desc" class="fr-input fr-textarea" name="description" placeholder="Mô tả cách tính năng này giúp ích cho bạn..."></textarea> </div> <div class="fr-toggle-row"> <div class="fr-toggle-row__label"> <span class="fr-toggle-row__text">Tôi sẽ cần sử dụng tính năng này thường xuyên</span> </div> <label class="fr-toggle"> <input type="checkbox" name="frequent" checked> <span class="fr-toggle__track"></span> </label> </div> <div class="fr-field"> <label class="fr-label" for="fr-email">Email liên hệ (nếu bạn muốn chúng tôi phản hồi)</label> <input id="fr-email" class="fr-input" type="email" name="email" placeholder="example@email.com"> </div> </form> </div> <!-- Footer --> <div class="fr-modal__footer"> <button id="fr-cancel-btn" class="fr-btn fr-btn--secondary" type="button">Hủy bỏ</button> <button id="fr-submit-btn" class="fr-btn fr-btn--primary" type="submit" form="featureForm"> <span>Gửi yêu cầu</span> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon> </svg> </button> </div> </div> </div>  <script>
+    {
+        const SCRIPT_URL =
+            "https://script.google.com/macros/s/AKfycbya-Fog_nwKb8NK5lL4zOV5mOFAQHxnO6K_QLF-2CfkP6sExu27I1p5L8D5Lv0lHB7D/exec";
+
+        const overlay = document.getElementById("fr-modal-overlay");
+        const form = document.getElementById("featureForm");
+        const closeBtn = document.getElementById("fr-close-btn");
+        const cancelBtn = document.getElementById("fr-cancel-btn");
+
+        // Modal open/close
+        function openModal() {
+            overlay.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+        }
+
+        function closeModal() {
+            overlay.setAttribute("aria-hidden", "true");
+            document.body.style.overflow = "";
+        }
+
+        window.openFeatureRequestModal = openModal;
+
+        closeBtn.addEventListener("click", closeModal);
+        cancelBtn.addEventListener("click", closeModal);
+
+        overlay.addEventListener("click", (e) => {
+            if (
+                e.target === overlay ||
+                e.target.classList.contains("fr-backdrop")
+            ) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener("keydown", (e) => {
+            if (
+                e.key === "Escape" &&
+                overlay.getAttribute("aria-hidden") === "false"
+            ) {
+                closeModal();
+            }
+        });
+
+        // Form submit
+        if (form) {
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                let clientId = localStorage.getItem("client_id");
+
+                if (!clientId) {
+                    clientId = crypto.randomUUID();
+                    localStorage.setItem("client_id", clientId);
+                }
+
+                const formData = new FormData(form);
+                const payload = {
+                    featureName: formData.get("featureName"),
+                    description: formData.get("description"),
+                    frequent: formData.get("frequent") === "on",
+                    email: formData.get("email"),
+                    clientId: clientId,
+                    userAgent: navigator.userAgent,
+                };
+
+                try {
+                    const response = await fetch(SCRIPT_URL, {
+                        method: "POST",
+                        mode: "cors",
+                        headers: {
+                            "Content-Type": "text/plain;charset=utf-8",
+                        },
+                        body: JSON.stringify(payload),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(
+                            `HTTP error! status: ${response.status}`,
+                        );
+                    }
+
+                    const result = await response.json();
+
+                    if (result.status === "success") {
+                        alert("Đã gửi đề xuất. Cảm ơn bạn!");
+                        form.reset();
+                        closeModal();
+                    } else {
+                        alert("Lỗi: " + (result.error || "Không xác định"));
+                    }
+                } catch {
+                    alert("Có lỗi xảy ra. Vui lòng thử lại.");
+                }
+            });
+        }
+    }
+</script> <script type="module">const s=document.querySelector(".site-header");if(s){const e=()=>{s.classList.toggle("is-scrolled",window.scrollY>0)};e(),window.addEventListener("scroll",e,{passive:!0})}</script></body></html> <!-- Templates --> <template id="sigx-queue-item-tpl"> <li class="sigx-queue__item" data-queue-index=""> <span class="sigx-queue__tag" data-kind=""></span> <div class="sigx-queue__info"> <p class="sigx-queue__name"></p> <p class="sigx-queue__meta"></p> </div> <button class="sigx-queue__remove" type="button" aria-label="Xoá file"> <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"> <line x1="18" y1="6" x2="6" y2="18"></line> <line x1="6" y1="6" x2="18" y2="18"></line> </svg> </button> </li> </template> <template id="sigx-file-item-tpl"> <li class="sigx-file" data-file-id=""> <span class="sigx-file__tag" data-kind=""></span> <div class="sigx-file__info"> <p class="sigx-file__name"></p> <p class="sigx-file__meta" data-state=""></p> </div> <span class="sigx-file__count" data-empty="true"></span> </li> </template> <template id="sigx-sig-accordion-tpl"> <li class="sigx-acc" data-sig-id="" data-expanded="false"> <button class="sigx-acc__header" type="button" aria-expanded="false"> <div class="sigx-acc__head-main"> <p class="sigx-acc__title"></p> <p class="sigx-acc__meta"></p> </div> <span class="sigx-acc__badge" data-state="unknown"></span> <span class="sigx-acc__chevron" aria-hidden="true"> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <polyline points="6 9 12 15 18 9"></polyline> </svg> </span> </button> <div class="sigx-acc__body"></div> </li> </template> <script type="module" src="/_astro/read-digital-signatures.astro_astro_type_script_index_0_lang.B1Ntf9Ul.js"></script>

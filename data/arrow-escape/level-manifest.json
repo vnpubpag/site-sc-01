@@ -1,0 +1,109 @@
+{
+  "levels": [
+    {
+      "levelIndex": 1,
+      "name": "Kim cương nhỏ",
+      "difficulty": "easy",
+      "variantCount": 20,
+      "file": "levels/level-01.json"
+    },
+    {
+      "levelIndex": 2,
+      "name": "Hình vuông",
+      "difficulty": "easy",
+      "variantCount": 20,
+      "file": "levels/level-02.json"
+    },
+    {
+      "levelIndex": 3,
+      "name": "Vòng tròn",
+      "difficulty": "easy",
+      "variantCount": 20,
+      "file": "levels/level-03.json"
+    },
+    {
+      "levelIndex": 4,
+      "name": "Trái tim",
+      "difficulty": "easy",
+      "variantCount": 20,
+      "file": "levels/level-04.json"
+    },
+    {
+      "levelIndex": 5,
+      "name": "Chữ C",
+      "difficulty": "easy",
+      "variantCount": 20,
+      "file": "levels/level-05.json"
+    },
+    {
+      "levelIndex": 6,
+      "name": "Kim cương lớn",
+      "difficulty": "medium",
+      "variantCount": 20,
+      "file": "levels/level-06.json"
+    },
+    {
+      "levelIndex": 7,
+      "name": "Lục giác",
+      "difficulty": "medium",
+      "variantCount": 20,
+      "file": "levels/level-07.json"
+    },
+    {
+      "levelIndex": 8,
+      "name": "Vòng tròn lớn",
+      "difficulty": "medium",
+      "variantCount": 20,
+      "file": "levels/level-08.json"
+    },
+    {
+      "levelIndex": 9,
+      "name": "Trái tim lớn",
+      "difficulty": "medium",
+      "variantCount": 20,
+      "file": "levels/level-09.json"
+    },
+    {
+      "levelIndex": 10,
+      "name": "Khối vuông lớn",
+      "difficulty": "medium",
+      "variantCount": 20,
+      "file": "levels/level-10.json"
+    },
+    {
+      "levelIndex": 11,
+      "name": "Lục giác khổng lồ",
+      "difficulty": "hard",
+      "variantCount": 20,
+      "file": "levels/level-11.json"
+    },
+    {
+      "levelIndex": 12,
+      "name": "Kim cương khổng lồ",
+      "difficulty": "hard",
+      "variantCount": 20,
+      "file": "levels/level-12.json"
+    },
+    {
+      "levelIndex": 13,
+      "name": "Chữ C khổng lồ",
+      "difficulty": "hard",
+      "variantCount": 20,
+      "file": "levels/level-13.json"
+    },
+    {
+      "levelIndex": 14,
+      "name": "Trái tim khổng lồ",
+      "difficulty": "hard",
+      "variantCount": 20,
+      "file": "levels/level-14.json"
+    },
+    {
+      "levelIndex": 15,
+      "name": "Vòng tròn khổng lồ",
+      "difficulty": "hard",
+      "variantCount": 20,
+      "file": "levels/level-15.json"
+    }
+  ]
+}
